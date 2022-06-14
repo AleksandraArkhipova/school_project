@@ -1,13 +1,11 @@
+package manager_and_tasks;
+
 public class SubTask extends Task {
-    protected int epicId;
+    private int epicId;
 
     public SubTask(String title, String description, String status, int id, int epicId) {
         super(title, description, status, id);
         this.epicId = epicId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public int getEpicId() {

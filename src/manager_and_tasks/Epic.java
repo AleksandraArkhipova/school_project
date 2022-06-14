@@ -1,8 +1,10 @@
+package manager_and_tasks;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
 
-    ArrayList<Integer> subtasks = new ArrayList<>();
+    private ArrayList<Integer> subtasks = new ArrayList<>();
 
     public Epic(String title, String description, int id) {
         this.title = title;
@@ -19,26 +21,17 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getSubTasksList() {
-        if (!subtasks.isEmpty()) {
-            return subtasks;
-        }
-        return null;
-    }
 
-    public int getId() {
-        return id;
+            return subtasks;
+
     }
 
     public boolean isSubTasksEmpty() {
         return subtasks.isEmpty();
     }
 
-    public void setStatus(String status) {
+    protected void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getStatus() {
-        return this.status;
     }
 
     public void clearSubtasksList() {

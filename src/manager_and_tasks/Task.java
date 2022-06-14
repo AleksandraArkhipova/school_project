@@ -1,3 +1,5 @@
+package manager_and_tasks;
+
 public class Task {
 
     protected String title;
@@ -16,6 +18,7 @@ public class Task {
     }
 
     public int getId() {
+
         return id;
     }
 }

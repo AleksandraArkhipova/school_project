@@ -1,4 +1,11 @@
+package main;
+
 import java.util.Scanner;
+
+import manager_and_tasks.Epic;
+import manager_and_tasks.Manager;
+import manager_and_tasks.Task;
+import manager_and_tasks.SubTask;
 
 public class Main {
 
@@ -26,7 +33,7 @@ public class Main {
         SubTask subtask1 = new SubTask(
                 "Сделать прививку от бешенства",
                 "Не забыть про штамп!",
-                "DONE",
+                "NEW",
                 manager.generateId(),
                 epic1.getId());
 
