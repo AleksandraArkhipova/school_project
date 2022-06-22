@@ -1,13 +1,15 @@
-package manager_and_tasks;
+package tasks_and_epics;
+
+import managers.TaskStatuses;
 
 public class Task {
 
     protected String title;
     protected String description;
     protected int id;
-    protected String status;
+    protected TaskStatuses status;
 
-    public Task(String title, String description, String status, int id) {
+    public Task(String title, String description, TaskStatuses status, int id) {
         this.title = title;
         this.description = description;
         this.status = status;
@@ -18,7 +20,6 @@ public class Task {
     }
 
     public int getId() {
-
         return id;
     }
 }

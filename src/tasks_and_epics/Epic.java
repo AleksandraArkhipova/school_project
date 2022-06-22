@@ -1,4 +1,6 @@
-package manager_and_tasks;
+package tasks_and_epics;
+
+import managers.TaskStatuses;
 
 import java.util.ArrayList;
 
@@ -27,10 +29,12 @@ public class Epic extends Task {
     }
 
     public boolean isSubTasksEmpty() {
+
         return subtasks.isEmpty();
     }
 
-    protected void setStatus(String status) {
+    public void setStatus(TaskStatuses status) {
+
         this.status = status;
     }
 

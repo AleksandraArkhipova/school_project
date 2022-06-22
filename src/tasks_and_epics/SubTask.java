@@ -1,18 +1,22 @@
-package manager_and_tasks;
+package tasks_and_epics;
+
+import managers.TaskStatuses;
 
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String title, String description, String status, int id, int epicId) {
+    public SubTask(String title, String description, TaskStatuses status, int id, int epicId) {
         super(title, description, status, id);
         this.epicId = epicId;
     }
 
     public int getEpicId() {
+
         return epicId;
     }
 
-    public String getStatus() {
+    public TaskStatuses getStatus() {
+
         return status;
     }
 }

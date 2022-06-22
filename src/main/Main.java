@@ -1,59 +1,61 @@
 package main;
 
 import java.util.Scanner;
+import managers.*;
+import tasks_and_epics.Epic;
+import tasks_and_epics.SubTask;
+import tasks_and_epics.Task;
 
-import manager_and_tasks.Epic;
-import manager_and_tasks.Manager;
-import manager_and_tasks.Task;
-import manager_and_tasks.SubTask;
+@SuppressWarnings("InfiniteLoopStatement")
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Manager manager = new Manager();
+    TaskManageable taskManager = Managers.getDefault();
+    HistoryManageable historyManager = Managers.getDefaultHistory();
 
         Task task1 = new Task(
                 "Забрать посылку с почты",
                 "До 15.06.22",
-                "NEW",
-                manager.generateId());
+                TaskStatuses.NEW,
+                taskManager.generateId());
 
         Task task2 = new Task(
                 "Пропылесосить квартиру",
                 "До 13.06.22",
-                "NEW",
-                manager.generateId());
+                TaskStatuses.NEW,
+                taskManager.generateId());
 
         Epic epic1 = new Epic(
                 "Получить полётный сертификат для кота",
                 "Действует 3 дня",
-                manager.generateId());
+                taskManager.generateId());
 
         SubTask subtask1 = new SubTask(
                 "Сделать прививку от бешенства",
                 "Не забыть про штамп!",
-                "NEW",
-                manager.generateId(),
+                TaskStatuses.NEW,
+                taskManager.generateId(),
                 epic1.getId());
 
         SubTask subtask2 = new SubTask(
                 "Пройти ветконтроль в аэропорту",
                 "Приехать за 3 часа до вылета",
-                "DONE",
-                manager.generateId(),
+                TaskStatuses.DONE,
+                taskManager.generateId(),
                 epic1.getId());
 
         Epic epic2 = new Epic(
                 "Подготовить велосипед к сезону",
                 "Перед выходными",
-                manager.generateId());
+                taskManager.generateId());
 
         SubTask subtask3 = new SubTask(
                 "Подкачать шины",
                 "Насос в гараже",
-                "NEW",
-                manager.generateId(),
+                TaskStatuses.NEW,
+                taskManager.generateId(),
                 epic2.getId());
 
         Scanner scanner = new Scanner(System.in); // сканнер и меню сделала для удобства отладки
@@ -65,38 +67,54 @@ public class Main {
             userInput = scanner.nextInt();
             if (userInput == 1) {
 
-                manager.addTask(task1);
-                manager.addTask(task2);
-                manager.addEpic(epic1);
-                manager.addEpic(epic2);
-                manager.addSubTask(subtask1);
-                manager.addSubTask(subtask2);
-                manager.addSubTask(subtask3);
+                taskManager.addTask(task1);
+                taskManager.addTask(task2);
+                taskManager.addEpic(epic1);
+                taskManager.addEpic(epic2);
+                taskManager.addSubTask(subtask1);
+                taskManager.addSubTask(subtask2);
+                taskManager.addSubTask(subtask3);
 
             } else if (userInput == 2) {
 
-                manager.getListOfAllTasks();
-                manager.getListOfAllSubTasks();
-                manager.getListOfAllEpics();
+                taskManager.getListOfAllTasks();
+                taskManager.getListOfAllSubTasks();
+                taskManager.getListOfAllEpics();
 
             } else if (userInput == 3) {
 
-                manager.removeAllTasks();
-                manager.removeAllSubTasks();
-                manager.removeAllEpics();
+                taskManager.removeAllTasks();
+                taskManager.removeAllSubTasks();
+                taskManager.removeAllEpics();
 
             } else if (userInput == 4) {
 
-                manager.getTaskById(task2.getId());
-                manager.getSubTaskById(subtask3.getId());
-                manager.getEpicById(epic2.getId());
+                taskManager.getTaskById(task2.getId());
+                taskManager.getSubTaskById(subtask3.getId());
+                taskManager.getEpicById(epic2.getId());
+
+                System.out.println(historyManager);
+
+                taskManager.getEpicById(epic1.getId());
+                taskManager.getSubTaskById(subtask1.getId());
+
+                System.out.println(historyManager);
+
+                taskManager.getEpicById(epic1.getId());
+                taskManager.getSubTaskById(subtask1.getId());
+                taskManager.getTaskById(task2.getId());
+                taskManager.getSubTaskById(subtask3.getId());
+                taskManager.getTaskById(task2.getId());
+                taskManager.getSubTaskById(subtask3.getId());
+
+                System.out.println(historyManager);
 
             } else if (userInput == 5) {
 
                 task1 = new Task(
                         "Забрать посылку с почты",
                         "До 20.06.22",
-                        "DONE",
+                        TaskStatuses.DONE,
                         task1.getId());
 
                 epic1 = new Epic(
@@ -107,23 +125,23 @@ public class Main {
                 subtask1 = new SubTask(
                         "Сделать прививку от бешенства",
                         "Не забыть про штамп!",
-                        "NEW",
+                        TaskStatuses.NEW,
                         subtask1.getId(),
                         subtask1.getEpicId());
 
-                manager.updateTask(task1);
-                manager.updateSubTask(subtask1);
-                manager.updateEpic(epic1);
+                taskManager.updateTask(task1);
+                taskManager.updateSubTask(subtask1);
+                taskManager.updateEpic(epic1);
 
             } else if (userInput == 6) {
 
-                manager.removeTaskById(task1.getId());
-                manager.removeSubTaskById(subtask1.getId());
-                manager.removeEpicById(epic1.getId());
+                taskManager.removeTaskById(task1.getId());
+                taskManager.removeSubTaskById(subtask1.getId());
+                taskManager.removeEpicById(epic1.getId());
 
             } else if (userInput == 7) {
 
-                manager.getSubtasksByEpicId(epic1.getId());
+                taskManager.getSubtasksByEpicId(epic1.getId());
 
             }
             printMenu();
