@@ -13,7 +13,6 @@ public class Main {
     public static void main(String[] args) {
 
     TaskManageable taskManager = Managers.getDefault();
-    HistoryManageable historyManager = Managers.getDefaultHistory();
 
         Task task1 = new Task(
                 "Забрать посылку с почты",
@@ -93,12 +92,12 @@ public class Main {
                 taskManager.getSubTaskById(subtask3.getId());
                 taskManager.getEpicById(epic2.getId());
 
-                System.out.println(historyManager);
+                System.out.println(taskManager); // распечатка истории, 3 элемента
 
                 taskManager.getEpicById(epic1.getId());
                 taskManager.getSubTaskById(subtask1.getId());
 
-                System.out.println(historyManager);
+                taskManager.getHistory(); // получение истории через метод, 5 элементов
 
                 taskManager.getEpicById(epic1.getId());
                 taskManager.getSubTaskById(subtask1.getId());
@@ -107,7 +106,7 @@ public class Main {
                 taskManager.getTaskById(task2.getId());
                 taskManager.getSubTaskById(subtask3.getId());
 
-                System.out.println(historyManager);
+                taskManager.getHistory();// получение истории через метод, 10 элементов
 
             } else if (userInput == 5) {
 

@@ -3,9 +3,9 @@ package managers;
 import tasks_and_epics.Epic;
 import tasks_and_epics.SubTask;
 import tasks_and_epics.Task;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public interface TaskManageable {
 
@@ -49,6 +49,6 @@ public interface TaskManageable {
 
     ArrayList<Integer> getSubtasksByEpicId(int epicId);
 
-    void setEpicStatus(int epicId);
+    List<Task> getHistory();
 
 }

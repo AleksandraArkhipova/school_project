@@ -5,6 +5,8 @@ import tasks_and_epics.SubTask;
 import tasks_and_epics.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import static managers.TaskStatuses.*;
 
 public class InMemoryTaskManager implements TaskManageable {
@@ -35,6 +37,7 @@ public class InMemoryTaskManager implements TaskManageable {
 
     @Override
     public HashMap<Integer, Epic> getListOfAllEpics() {
+
         return epics;
     }
 
@@ -49,6 +52,9 @@ public class InMemoryTaskManager implements TaskManageable {
     public void removeAllSubTasks() {
         if (!subtasks.isEmpty()) {
             subtasks.clear();
+        }
+        for ( Epic epic : epics.values()) {
+            epic.clearSubtasksList();
         }
     }
 
@@ -127,11 +133,14 @@ public class InMemoryTaskManager implements TaskManageable {
     @Override
     public void removeSubTaskById(int subtaskId) {
 
-        Epic epic = epics.get(subtasks.get(subtaskId).getEpicId());
+        SubTask subtask = subtasks.get(subtaskId);
+        Epic epic = epics.get(subtask.getEpicId());
+
         if (!subtasks.isEmpty()) {
             epic.removeSubTaskById(subtaskId);
             subtasks.remove(subtaskId);
         }
+
         setEpicStatus(epic.getId());
     }
 
@@ -154,8 +163,12 @@ public class InMemoryTaskManager implements TaskManageable {
         return getEpic(epicId).getSubTasksList();
     }
 
-    @Override
-    public void setEpicStatus(int epicId) {
+
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
+    private void setEpicStatus(int epicId) {
 
         int newCounter = 0;
         int inProgressCounter = 0;
@@ -192,5 +205,14 @@ public class InMemoryTaskManager implements TaskManageable {
 
     private Epic getEpic(int epicId) {
         return epics.get(epicId);
+    }
+
+    @Override
+    public String toString() {
+        return "history.size = "
+                + historyManager.getHistory().size()
+                + ", history.contains: "
+                + historyManager.getHistory() +
+                '}';
     }
 }

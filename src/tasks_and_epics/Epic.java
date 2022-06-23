@@ -24,7 +24,7 @@ public class Epic extends Task {
 
     public ArrayList<Integer> getSubTasksList() {
 
-            return subtasks;
+        return subtasks;
 
     }
 
@@ -39,6 +39,7 @@ public class Epic extends Task {
     }
 
     public void clearSubtasksList() {
+
         subtasks.clear();
     }
 }
