@@ -1,8 +1,8 @@
 package managers;
 
-import tasks_and_epics.Epic;
-import tasks_and_epics.SubTask;
-import tasks_and_epics.Task;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +55,7 @@ public class InMemoryTaskManager implements TaskManageable {
         }
         for ( Epic epic : epics.values()) {
             epic.clearSubtasksList();
+            setEpicStatus(epic.getId());
         }
     }
 
@@ -153,6 +154,7 @@ public class InMemoryTaskManager implements TaskManageable {
                     subtasks.remove(subtaskId);
                 }
                 epic.clearSubtasksList();
+                setEpicStatus(epicId);
             }
             epics.remove(epicId);
         }

@@ -1,4 +1,4 @@
-package tasks_and_epics;
+package tasks;
 
 import managers.TaskStatuses;
 
@@ -41,5 +41,6 @@ public class Epic extends Task {
     public void clearSubtasksList() {
 
         subtasks.clear();
+
     }
 }

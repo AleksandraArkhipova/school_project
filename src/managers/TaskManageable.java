@@ -1,8 +1,8 @@
 package managers;
 
-import tasks_and_epics.Epic;
-import tasks_and_epics.SubTask;
-import tasks_and_epics.Task;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

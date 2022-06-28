@@ -1,6 +1,6 @@
 package managers;
 
-import tasks_and_epics.Task;
+import tasks.Task;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package tasks_and_epics;
+package tasks;
 
 import managers.TaskStatuses;
 
