@@ -3,6 +3,7 @@ package managers;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,7 @@ public class InMemoryTaskManager implements TaskManageable {
     private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
 
-    HistoryManageable historyManager = new InMemoryHistoryManager();
+    HistoryManageable historyManager = Managers.getDefaultHistory();
 
     @Override
     public int generateId() {
@@ -53,7 +54,7 @@ public class InMemoryTaskManager implements TaskManageable {
         if (!subtasks.isEmpty()) {
             subtasks.clear();
         }
-        for ( Epic epic : epics.values()) {
+        for (Epic epic : epics.values()) {
             epic.clearSubtasksList();
             setEpicStatus(epic.getId());
         }
@@ -129,6 +130,7 @@ public class InMemoryTaskManager implements TaskManageable {
         if (!tasks.isEmpty()) {
             tasks.remove(taskId);
         }
+        historyManager.remove(taskId);
     }
 
     @Override
@@ -141,7 +143,7 @@ public class InMemoryTaskManager implements TaskManageable {
             epic.removeSubTaskById(subtaskId);
             subtasks.remove(subtaskId);
         }
-
+        historyManager.remove(subtaskId);
         setEpicStatus(epic.getId());
     }
 
@@ -149,23 +151,29 @@ public class InMemoryTaskManager implements TaskManageable {
     public void removeEpicById(int epicId) {
         if (epics.containsKey(epicId)) {
             Epic epic = epics.get(epicId);
-            if (!subtasks.isEmpty() && !epic.isSubTasksEmpty()) {
+            if (!epic.isSubTasksEmpty() && !subtasks.isEmpty()) {
                 for (int subtaskId : epic.getSubTasksList()) {
                     subtasks.remove(subtaskId);
+                    historyManager.remove(subtaskId);
                 }
                 epic.clearSubtasksList();
                 setEpicStatus(epicId);
             }
             epics.remove(epicId);
+            historyManager.remove(epicId);
         }
     }
 
     @Override
     public ArrayList<Integer> getSubtasksByEpicId(int epicId) {
-        return getEpic(epicId).getSubTasksList();
+        ArrayList<Integer> listOfSubtasks = getEpic(epicId).getSubTasksList();
+        for (Integer id : listOfSubtasks) {
+            historyManager.add(subtasks.get(id));
+        }
+        return listOfSubtasks;
     }
 
-
+    @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
@@ -177,44 +185,36 @@ public class InMemoryTaskManager implements TaskManageable {
         int doneCounter = 0;
 
         Epic epic = epics.get(epicId);
-
-        if (!epic.isSubTasksEmpty()) {
-            for (Integer subtaskId : epic.getSubTasksList()) {
-                switch (subtasks.get(subtaskId).getStatus()) {
-                    case NEW:
-                        newCounter += 1;
-                        break;
-                    case IN_PROGRESS:
-                        inProgressCounter += 1;
-                        break;
-                    case DONE:
-                        doneCounter += 1;
-                        break;
+        if (epic != null) {
+            if (!epic.isSubTasksEmpty()) {
+                for (Integer subtaskId : epic.getSubTasksList()) {
+                    switch (subtasks.get(subtaskId).getStatus()) {
+                        case NEW:
+                            newCounter += 1;
+                            break;
+                        case IN_PROGRESS:
+                            inProgressCounter += 1;
+                            break;
+                        case DONE:
+                            doneCounter += 1;
+                            break;
+                    }
                 }
-            }
-            if (inProgressCounter == 0 && doneCounter == 0 && newCounter != 0) {
-                epic.setStatus(NEW);
-            } else if (inProgressCounter == 0 && newCounter == 0 && doneCounter != 0) {
-                epic.setStatus(DONE);
-            } else {
-                epic.setStatus(IN_PROGRESS);
-            }
+                if (inProgressCounter == 0 && doneCounter == 0 && newCounter != 0) {
+                    epic.setStatus(NEW);
+                } else if (inProgressCounter == 0 && newCounter == 0 && doneCounter != 0) {
+                    epic.setStatus(DONE);
+                } else {
+                    epic.setStatus(IN_PROGRESS);
+                }
 
-        } else {
-            epic.setStatus(NEW);
+            } else {
+                epic.setStatus(NEW);
+            }
         }
     }
 
     private Epic getEpic(int epicId) {
         return epics.get(epicId);
-    }
-
-    @Override
-    public String toString() {
-        return "history.size = "
-                + historyManager.getHistory().size()
-                + ", history.contains: "
-                + historyManager.getHistory() +
-                '}';
     }
 }

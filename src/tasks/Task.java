@@ -22,4 +22,9 @@ public class Task {
     public int getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "Task with ID " + id ;
+    }
 }

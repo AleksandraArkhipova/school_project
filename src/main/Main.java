@@ -45,19 +45,19 @@ public class Main {
                 taskManager.generateId(),
                 epic1.getId());
 
+        SubTask subtask3 = new SubTask(
+                "Сесть в самолёт",
+                "Переноску можно поставить на колени",
+                TaskStatuses.NEW,
+                taskManager.generateId(),
+                epic1.getId());
+
         Epic epic2 = new Epic(
                 "Подготовить велосипед к сезону",
                 "Перед выходными",
                 taskManager.generateId());
 
-        SubTask subtask3 = new SubTask(
-                "Подкачать шины",
-                "Насос в гараже",
-                TaskStatuses.NEW,
-                taskManager.generateId(),
-                epic2.getId());
-
-        Scanner scanner = new Scanner(System.in); // сканнер и меню сделала для удобства отладки
+        Scanner scanner = new Scanner(System.in); 
         int userInput;
 
         System.out.println("Добро пожаловать в менеджер задач. Выберите действие: \n");
@@ -88,25 +88,28 @@ public class Main {
 
             } else if (userInput == 4) {
 
-                taskManager.getTaskById(task2.getId());
-                taskManager.getSubTaskById(subtask3.getId());
-                taskManager.getEpicById(epic2.getId());
+                taskManager.getTaskById(task2.getId());//(ID2)
+                taskManager.getSubTaskById(subtask3.getId());//(ID6)
+                taskManager.getEpicById(epic2.getId());//(ID7)
 
-                System.out.println(taskManager); // распечатка истории, 3 элемента
+                taskManager.getHistory();
 
-                taskManager.getEpicById(epic1.getId());
-                taskManager.getSubTaskById(subtask1.getId());
+                taskManager.getEpicById(epic1.getId()); //(ID3)
+                taskManager.getEpicById(epic2.getId()); //(ID7)
+                taskManager.getSubTaskById(subtask3.getId());//(ID6)
+                taskManager.getSubTaskById(subtask1.getId());//(ID4)
 
-                taskManager.getHistory(); // получение истории через метод, 5 элементов
+                taskManager.getHistory();
 
-                taskManager.getEpicById(epic1.getId());
-                taskManager.getSubTaskById(subtask1.getId());
-                taskManager.getTaskById(task2.getId());
-                taskManager.getSubTaskById(subtask3.getId());
-                taskManager.getTaskById(task2.getId());
-                taskManager.getSubTaskById(subtask3.getId());
+                taskManager.getEpicById(epic1.getId()); //(ID3)
+                taskManager.getSubTaskById(subtask1.getId());//(ID4)
+                taskManager.getSubTaskById(subtask2.getId());//(ID5)
+                taskManager.getSubTaskById(subtask3.getId());//(ID6)
+                taskManager.getTaskById(task2.getId()); //(ID2)
+                taskManager.getTaskById(task1.getId()); //(ID1)
 
-                taskManager.getHistory();// получение истории через метод, 10 элементов
+                taskManager.getHistory();
+
 
             } else if (userInput == 5) {
 
@@ -134,9 +137,9 @@ public class Main {
 
             } else if (userInput == 6) {
 
-                taskManager.removeTaskById(task1.getId());
-                taskManager.removeSubTaskById(subtask1.getId());
-                taskManager.removeEpicById(epic1.getId());
+                taskManager.removeTaskById(task1.getId()); //(ID1)
+                taskManager.removeSubTaskById(subtask1.getId()); //(ID4)
+                taskManager.removeEpicById(epic1.getId()); //(ID3)
 
             } else if (userInput == 7) {
 
@@ -149,13 +152,13 @@ public class Main {
 
     public static void printMenu() {
 
-        System.out.println("\n1. Добавить все задачи, подзадачи, эпики\n");
-        System.out.println("2. Получить список всех задач, подзадач, эпиков\n");
-        System.out.println("3. Удалить все задачи, подзадачи, эпики \n");
-        System.out.println("4. Получить задачу № 2, подзадачу № 3 и эпик № 2 по идентификатору\n");
-        System.out.println("5. Обновить задачу, подзадачу и эпик под номером 1\n");
-        System.out.println("6. Удалить задачу, подзадачу и эпик под номером 1 по идентификатору\n");
-        System.out.println("7. Получить список всех подзадач эпика номер 1 \n");
+        System.out.println("\n1. Добавление всех задач \n");
+        System.out.println("2. Получение списка всех задач\n");
+        System.out.println("3. Удаление всех задач \n");
+        System.out.println("4. Просмотр истории просмотров без повторов \n");
+        System.out.println("5. Обновление выбранных элементов \n");
+        System.out.println("6. Удаление выбранных элементов\n");
+        System.out.println("7. Получение списка всех подзадач эпика № 1 \n");
 
     }
 }

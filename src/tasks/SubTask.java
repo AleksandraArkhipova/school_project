@@ -19,4 +19,9 @@ public class SubTask extends Task {
 
         return status;
     }
+
+    @Override
+    public String toString() {
+        return "SubTask with ID " + id ;
+    }
 }

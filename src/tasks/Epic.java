@@ -43,4 +43,8 @@ public class Epic extends Task {
         subtasks.clear();
 
     }
+    @Override
+    public String toString() {
+        return "Epic with ID " + id ;
+    }
 }
