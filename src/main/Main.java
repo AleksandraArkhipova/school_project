@@ -57,7 +57,7 @@ public class Main {
                 "Перед выходными",
                 taskManager.generateId());
 
-        Scanner scanner = new Scanner(System.in); 
+        Scanner scanner = new Scanner(System.in);
         int userInput;
 
         System.out.println("Добро пожаловать в менеджер задач. Выберите действие: \n");
@@ -94,22 +94,21 @@ public class Main {
 
                 taskManager.getHistory();
 
-                taskManager.getEpicById(epic1.getId()); //(ID3)
-                taskManager.getEpicById(epic2.getId()); //(ID7)
-                taskManager.getSubTaskById(subtask3.getId());//(ID6)
-                taskManager.getSubTaskById(subtask1.getId());//(ID4)
+                taskManager.getEpicById(epic1.getId()); //(ID3) 2 6 7 3
+                taskManager.getEpicById(epic2.getId()); //(ID7) 2 6 3 7
+                taskManager.getSubTaskById(subtask3.getId());//(ID6) 2 3 7 6
+                taskManager.getSubTaskById(subtask1.getId());//(ID4) 2 3 7 6 4
 
-                taskManager.getHistory();
+                taskManager.getHistory(); //2 3 7 6 4
 
-                taskManager.getEpicById(epic1.getId()); //(ID3)
-                taskManager.getSubTaskById(subtask1.getId());//(ID4)
-                taskManager.getSubTaskById(subtask2.getId());//(ID5)
-                taskManager.getSubTaskById(subtask3.getId());//(ID6)
-                taskManager.getTaskById(task2.getId()); //(ID2)
-                taskManager.getTaskById(task1.getId()); //(ID1)
+                taskManager.getEpicById(epic1.getId()); //(ID3) //2 7 6 4 3
+                taskManager.getSubTaskById(subtask1.getId());//(ID4) // 2 7 6 3 4
+                taskManager.getSubTaskById(subtask2.getId());//(ID5) // 2 7 6 3 4 5
+                taskManager.getSubTaskById(subtask3.getId());//(ID6) // 2 7 3 4 5 6
+                taskManager.getTaskById(task2.getId()); //(ID2) //  7 3 4 5 6 2
+                taskManager.getTaskById(task1.getId()); //(ID1) //  7 3 4 5 6 2 1
 
-                taskManager.getHistory();
-
+                taskManager.getHistory(); //  7 3 4 5 6 2 1
 
             } else if (userInput == 5) {
 

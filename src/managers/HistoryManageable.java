@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface HistoryManageable {
 
-    void add(Task element);
-
-    List<Task> getHistory();
+    List<Task> getHistoryList();
 
     void remove(int id);
+
+    void add(Task element);
 }

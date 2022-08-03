@@ -45,6 +45,9 @@ public class InMemoryTaskManager implements TaskManageable {
     @Override
     public void removeAllTasks() {
         if (!tasks.isEmpty()) {
+            for (Task task : tasks.values()) {
+                historyManager.remove(task.getId());
+            }
             tasks.clear();
         }
     }
@@ -52,6 +55,9 @@ public class InMemoryTaskManager implements TaskManageable {
     @Override
     public void removeAllSubTasks() {
         if (!subtasks.isEmpty()) {
+            for (Task subtask : subtasks.values()) {
+                historyManager.remove(subtask.getId());
+            }
             subtasks.clear();
         }
         for (Epic epic : epics.values()) {
@@ -62,9 +68,12 @@ public class InMemoryTaskManager implements TaskManageable {
 
     @Override
     public void removeAllEpics() {
+        removeAllSubTasks();
         if (!epics.isEmpty()) {
+            for (Epic epic : epics.values()) {
+                historyManager.remove(epic.getId());
+            }
             epics.clear();
-            subtasks.clear();
         }
     }
 
@@ -175,7 +184,7 @@ public class InMemoryTaskManager implements TaskManageable {
 
     @Override
     public List<Task> getHistory() {
-        return historyManager.getHistory();
+        return historyManager.getHistoryList();
     }
 
     private void setEpicStatus(int epicId) {
