@@ -4,18 +4,15 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public interface TaskManageable {
 
-    int generateId();
+    List<Task> getListOfAllTasks();
 
-    HashMap<Integer, Task> getListOfAllTasks();
+    List<Task> getListOfAllSubTasks();
 
-    HashMap<Integer, SubTask> getListOfAllSubTasks();
-
-    HashMap<Integer, Epic> getListOfAllEpics();
+    List<Task> getListOfAllEpics();
 
     void removeAllTasks();
 

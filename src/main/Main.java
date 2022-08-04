@@ -18,44 +18,44 @@ public class Main {
                 "Забрать посылку с почты",
                 "До 15.06.22",
                 TaskStatuses.NEW,
-                taskManager.generateId());
+                0);
 
         Task task2 = new Task(
                 "Пропылесосить квартиру",
                 "До 13.06.22",
                 TaskStatuses.NEW,
-                taskManager.generateId());
+                0);
 
         Epic epic1 = new Epic(
                 "Получить полётный сертификат для кота",
                 "Действует 3 дня",
-                taskManager.generateId());
+                0);
 
         SubTask subtask1 = new SubTask(
                 "Сделать прививку от бешенства",
                 "Не забыть про штамп!",
                 TaskStatuses.NEW,
-                taskManager.generateId(),
-                epic1.getId());
+                0,
+                3);
 
         SubTask subtask2 = new SubTask(
                 "Пройти ветконтроль в аэропорту",
                 "Приехать за 3 часа до вылета",
                 TaskStatuses.DONE,
-                taskManager.generateId(),
-                epic1.getId());
+                0,
+                3);
 
         SubTask subtask3 = new SubTask(
                 "Сесть в самолёт",
                 "Переноску можно поставить на колени",
                 TaskStatuses.NEW,
-                taskManager.generateId(),
-                epic1.getId());
+                0,
+                3);
 
         Epic epic2 = new Epic(
                 "Подготовить велосипед к сезону",
                 "Перед выходными",
-                taskManager.generateId());
+                0);
 
         Scanner scanner = new Scanner(System.in);
         int userInput;
@@ -89,26 +89,26 @@ public class Main {
             } else if (userInput == 4) {
 
                 taskManager.getTaskById(task2.getId());//(ID2)
-                taskManager.getSubTaskById(subtask3.getId());//(ID6)
-                taskManager.getEpicById(epic2.getId());//(ID7)
+                taskManager.getSubTaskById(subtask3.getId());//(ID7)
+                taskManager.getEpicById(epic2.getId());//(ID4)
 
-                taskManager.getHistory();
+                taskManager.getHistory(); // 2 7 4
 
-                taskManager.getEpicById(epic1.getId()); //(ID3) 2 6 7 3
-                taskManager.getEpicById(epic2.getId()); //(ID7) 2 6 3 7
-                taskManager.getSubTaskById(subtask3.getId());//(ID6) 2 3 7 6
-                taskManager.getSubTaskById(subtask1.getId());//(ID4) 2 3 7 6 4
+                taskManager.getEpicById(epic1.getId()); //(ID3)
+                taskManager.getEpicById(epic2.getId()); //(ID4)
+                taskManager.getSubTaskById(subtask3.getId());//(ID7)
+                taskManager.getSubTaskById(subtask1.getId());//(ID5)
 
-                taskManager.getHistory(); //2 3 7 6 4
+                taskManager.getHistory(); //2 3 4 7 5
 
-                taskManager.getEpicById(epic1.getId()); //(ID3) //2 7 6 4 3
-                taskManager.getSubTaskById(subtask1.getId());//(ID4) // 2 7 6 3 4
-                taskManager.getSubTaskById(subtask2.getId());//(ID5) // 2 7 6 3 4 5
-                taskManager.getSubTaskById(subtask3.getId());//(ID6) // 2 7 3 4 5 6
-                taskManager.getTaskById(task2.getId()); //(ID2) //  7 3 4 5 6 2
-                taskManager.getTaskById(task1.getId()); //(ID1) //  7 3 4 5 6 2 1
+                taskManager.getEpicById(epic1.getId()); //(ID3) // 2 4 7 5 3
+                taskManager.getSubTaskById(subtask1.getId());//(ID5) // 2 4 7 3 5
+                taskManager.getSubTaskById(subtask2.getId());//(ID6) // 2 4 7 3 5 6
+                taskManager.getSubTaskById(subtask3.getId());//(ID7) // 2 4 3 5 6 7
+                taskManager.getTaskById(task2.getId()); //(ID2) // 4 3 5 6 7 2
+                taskManager.getTaskById(task1.getId()); //(ID1) // 4 3 5 6 7 2 1
 
-                taskManager.getHistory(); //  7 3 4 5 6 2 1
+                taskManager.getHistory(); //
 
             } else if (userInput == 5) {
 

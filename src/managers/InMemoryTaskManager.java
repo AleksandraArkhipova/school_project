@@ -18,28 +18,26 @@ public class InMemoryTaskManager implements TaskManageable {
     private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
 
-    HistoryManageable historyManager = Managers.getDefaultHistory();
+    private HistoryManageable historyManager = Managers.getDefaultHistory();
 
-    @Override
-    public int generateId() {
+    private int generateId() {
         uniqueId++;
         return uniqueId;
     }
 
     @Override
-    public HashMap<Integer, Task> getListOfAllTasks() {
-        return tasks;
+    public List<Task> getListOfAllTasks() {
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public HashMap<Integer, SubTask> getListOfAllSubTasks() {
-        return subtasks;
+    public List<Task> getListOfAllSubTasks() {
+        return new ArrayList<>(subtasks.values());
     }
 
     @Override
-    public HashMap<Integer, Epic> getListOfAllEpics() {
-
-        return epics;
+    public List<Task> getListOfAllEpics() {
+        return new ArrayList<>(epics.values());
     }
 
     @Override
@@ -97,19 +95,25 @@ public class InMemoryTaskManager implements TaskManageable {
 
     @Override
     public void addTask(Task task) {
-        tasks.put(task.getId(), task);
+        int id = generateId();
+        task.setId(id);
+        tasks.put(id, task);
     }
 
     @Override
     public void addSubTask(SubTask subtask) {
-        subtasks.put(subtask.getId(), subtask);
-        getEpic(subtask.getEpicId()).addSubtask(subtask.getId());
+        int id = generateId();
+        subtask.setId(id);
+        subtasks.put(id, subtask);
+        getEpic(subtask.getEpicId()).addSubtask(id);
         setEpicStatus(subtask.getEpicId());
     }
 
     @Override
     public void addEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
+        int id = generateId();
+        epic.setId(id);
+        epics.put(id, epic);
     }
 
     @Override
