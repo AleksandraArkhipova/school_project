@@ -37,17 +37,17 @@ public class InMemoryHistoryManager implements HistoryManageable {
 
     public static class Node<T extends Task> extends Task {
 
-        public Task data;
-        public Node<Task> next;
-        public Node<Task> prev;
+        public T data;
+        public Node<T> next;
+        public Node<T> prev;
 
-        public Node(Node<Task> prev, Task data, Node<Task> next) {
+        public Node(Node<T> prev, T data, Node<T> next) {
             this.data = data;
             this.next = next;
             this.prev = prev;
         }
 
-        public Task getData() {
+        public T getData() {
             return data;
         }
 
@@ -77,46 +77,31 @@ public class InMemoryHistoryManager implements HistoryManageable {
         }
         Node<Task> nodeForCycle = firstNode;
         printHistoryList.add(firstNode.getData());
-        Node<Task> nodeToAdd;
 
-        for (int i = 1; i < historyMap.size(); i++) {
-            if (!printHistoryList.contains(nodeForCycle.getData())) {
-                nodeToAdd = nodeForCycle;
-                printHistoryList.add(nodeToAdd.getData());
-            } else if (nodeForCycle.next != null) {
-                    nodeToAdd = nodeForCycle.next;
-                printHistoryList.add(nodeToAdd.getData());
-            } else {
-                nodeToAdd = null;
-            }
-
-            if (nodeToAdd.next != null) {
-                nodeForCycle = nodeToAdd.next;
-            }
+        while (nodeForCycle != null) {
+            printHistoryList.add(nodeForCycle.getData());
+            nodeForCycle = nodeForCycle.next;
         }
+
         return printHistoryList;
     }
 
     private void removeNode(int id) {
         if (historyMap.containsKey(id)) {
+
             Node<Task> node = historyMap.get(id);
             Node<Task> prevNode = node.prev;
             Node<Task> nextNode = node.next;
+
             if (prevNode != null) {
                 prevNode.next = nextNode;
-                int prevNodeId = prevNode.getData().getId();
-                historyMap.put(prevNodeId, prevNode);
-
+            } else {
+                firstNode = nextNode;
             }
-
             if (nextNode != null) {
-                if (prevNode == null) {
-                    firstNode = nextNode;
-                    firstNode.prev = null;
-                    historyMap.put(firstNode.getData().getId(), firstNode);
-                } else {
-                    nextNode.prev = prevNode;
-                }
+                nextNode.prev = prevNode;
+            } else {
+                lastNode = prevNode;
             }
             historyMap.remove(id);
         }
