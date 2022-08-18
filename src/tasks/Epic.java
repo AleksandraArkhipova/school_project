@@ -1,7 +1,5 @@
 package tasks;
 
-import managers.TaskStatuses;
-
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -33,18 +31,10 @@ public class Epic extends Task {
         return subtasks.isEmpty();
     }
 
-    public void setStatus(TaskStatuses status) {
-
-        this.status = status;
-    }
-
     public void clearSubtasksList() {
 
         subtasks.clear();
 
     }
-    @Override
-    public String toString() {
-        return "Epic with ID " + id ;
-    }
+
 }

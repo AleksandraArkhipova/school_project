@@ -1,5 +1,7 @@
 package main;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 import managers.*;
 import tasks.Epic;
@@ -10,10 +12,11 @@ import tasks.Task;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
     TaskManageable taskManager = Managers.getDefault();
-
+    FileBackedTasksManager backedTasksManager = FileBackedTasksManager.loadFromFile(new File(
+                "C:\\Users\\79992\\dev\\HwSprint3\\java-kanban\\src", "FileBackedTasksManager.csv"));
         Task task1 = new Task(
                 "Забрать посылку с почты",
                 "До 15.06.22",
@@ -67,12 +70,25 @@ public class Main {
             if (userInput == 1) {
 
                 taskManager.addTask(task1);
+                backedTasksManager.addTask(task1);
+
                 taskManager.addTask(task2);
+                backedTasksManager.addTask(task2);
+
                 taskManager.addEpic(epic1);
+                backedTasksManager.addEpic(epic1);
+
                 taskManager.addEpic(epic2);
+                backedTasksManager.addEpic(epic2);
+
                 taskManager.addSubTask(subtask1);
+                backedTasksManager.addSubTask(subtask1);
+
                 taskManager.addSubTask(subtask2);
+                backedTasksManager.addSubTask(subtask2);
+
                 taskManager.addSubTask(subtask3);
+                backedTasksManager.addSubTask(subtask3);
 
             } else if (userInput == 2) {
 
@@ -89,10 +105,17 @@ public class Main {
             } else if (userInput == 4) {
 
                 taskManager.getTaskById(task2.getId());//(ID2)
-                taskManager.getSubTaskById(subtask3.getId());//(ID7)
-                taskManager.getEpicById(epic2.getId());//(ID4)
+                backedTasksManager.getTaskById(task2.getId());
 
-                taskManager.getHistory(); // 2 7 4
+                taskManager.getSubTaskById(subtask3.getId());//(ID7)
+                backedTasksManager.getSubTaskById(subtask3.getId());
+
+                taskManager.getEpicById(epic2.getId());//(ID4)
+                backedTasksManager.getEpicById(epic2.getId());
+
+                taskManager.getHistory();
+                backedTasksManager.getHistory();
+                // 2 7 4
 
                 taskManager.getEpicById(epic1.getId()); //(ID3)
                 taskManager.getEpicById(epic2.getId()); //(ID4)

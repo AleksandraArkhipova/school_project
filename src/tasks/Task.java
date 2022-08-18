@@ -2,6 +2,8 @@ package tasks;
 
 import managers.TaskStatuses;
 
+import java.util.Locale;
+
 public class Task {
 
     protected String title;
@@ -19,6 +21,10 @@ public class Task {
     public Task() {
     }
 
+    public void setStatus(TaskStatuses status) {
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }
@@ -29,6 +35,9 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task with ID " + id ;
+        String type = this.getClass().toString().toUpperCase()
+                .replace("CLASS TASKS.", "");
+
+        return id + "," + type + "," + title + "," + status + "," + description + ",";
     }
 }

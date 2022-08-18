@@ -18,7 +18,7 @@ public class InMemoryTaskManager implements TaskManageable {
     private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
 
-    private HistoryManageable historyManager = Managers.getDefaultHistory();
+    protected final HistoryManageable historyManager = Managers.getDefaultHistory();
 
     private int generateId() {
         uniqueId++;
@@ -105,14 +105,19 @@ public class InMemoryTaskManager implements TaskManageable {
         int id = generateId();
         subtask.setId(id);
         subtasks.put(id, subtask);
-        getEpic(subtask.getEpicId()).addSubtask(id);
-        setEpicStatus(subtask.getEpicId());
+
+        Epic epic = getEpic(subtask.getEpicId());
+            if(epic != null) {
+            epic.addSubtask(id);
+            setEpicStatus(subtask.getEpicId());
+        }
     }
 
     @Override
     public void addEpic(Epic epic) {
         int id = generateId();
         epic.setId(id);
+        epic.setStatus(NEW);
         epics.put(id, epic);
     }
 
@@ -189,6 +194,7 @@ public class InMemoryTaskManager implements TaskManageable {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistoryList();
+
     }
 
     private void setEpicStatus(int epicId) {
