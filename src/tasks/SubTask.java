@@ -3,10 +3,10 @@ package tasks;
 import managers.TaskStatuses;
 
 public class SubTask extends Task {
-    private int epicId;
+    private final int epicId;
 
-    public SubTask(String title, String description, TaskStatuses status, int id, int epicId) {
-        super(title, description, status, id);
+    public SubTask(String title, TaskTypes type, String description, TaskStatuses status, int id, int epicId) {
+        super(title, type, description, status, id);
         this.epicId = epicId;
     }
 

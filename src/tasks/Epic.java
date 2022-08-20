@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 public class Epic extends Task {
 
-    private ArrayList<Integer> subtasks = new ArrayList<>();
+    private final ArrayList<Integer> subtasks = new ArrayList<>();
 
-    public Epic(String title, String description, int id) {
+    public Epic(String title, TaskTypes type, String description, int id) {
         this.title = title;
+        this.type = type;
         this.description = description;
         this.id = id;
     }
@@ -26,9 +27,9 @@ public class Epic extends Task {
 
     }
 
-    public boolean isSubTasksEmpty() {
+    public boolean isContainItems() {
 
-        return subtasks.isEmpty();
+        return !subtasks.isEmpty();
     }
 
     public void clearSubtasksList() {

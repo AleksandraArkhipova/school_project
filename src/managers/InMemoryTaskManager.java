@@ -12,7 +12,7 @@ import static managers.TaskStatuses.*;
 
 public class InMemoryTaskManager implements TaskManageable {
 
-    private int uniqueId = 0;
+    protected int uniqueId = 0;
 
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
@@ -94,15 +94,20 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public void addTask(Task task) {
-        int id = generateId();
+    public void addTask(Task task, int id) {
+        if (id == -1) {
+            id = generateId();
+        }
         task.setId(id);
         tasks.put(id, task);
     }
 
     @Override
-    public void addSubTask(SubTask subtask) {
-        int id = generateId();
+    public void addSubTask(SubTask subtask, int id) {
+
+        if (id == -1) {
+            id = generateId();
+        }
         subtask.setId(id);
         subtasks.put(id, subtask);
 
@@ -114,8 +119,10 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        int id = generateId();
+    public void addEpic(Epic epic, int id) {
+        if (id == -1) {
+            id = generateId();
+        }
         epic.setId(id);
         epic.setStatus(NEW);
         epics.put(id, epic);
@@ -169,7 +176,7 @@ public class InMemoryTaskManager implements TaskManageable {
     public void removeEpicById(int epicId) {
         if (epics.containsKey(epicId)) {
             Epic epic = epics.get(epicId);
-            if (!epic.isSubTasksEmpty() && !subtasks.isEmpty()) {
+            if (epic.isContainItems() && !subtasks.isEmpty()) {
                 for (int subtaskId : epic.getSubTasksList()) {
                     subtasks.remove(subtaskId);
                     historyManager.remove(subtaskId);
@@ -205,7 +212,7 @@ public class InMemoryTaskManager implements TaskManageable {
 
         Epic epic = epics.get(epicId);
         if (epic != null) {
-            if (!epic.isSubTasksEmpty()) {
+            if (epic.isContainItems()) {
                 for (Integer subtaskId : epic.getSubTasksList()) {
                     switch (subtasks.get(subtaskId).getStatus()) {
                         case NEW:

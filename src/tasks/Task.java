@@ -2,17 +2,17 @@ package tasks;
 
 import managers.TaskStatuses;
 
-import java.util.Locale;
-
 public class Task {
 
     protected String title;
     protected String description;
     protected int id;
     protected TaskStatuses status;
+    protected TaskTypes type;
 
-    public Task(String title, String description, TaskStatuses status, int id) {
+    public Task(String title, TaskTypes type, String description, TaskStatuses status, int id) {
         this.title = title;
+        this.type = type;
         this.description = description;
         this.status = status;
         this.id = id;
@@ -27,6 +27,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public TaskTypes getType() {
+        return type;
     }
 
     public void setId(int id) {

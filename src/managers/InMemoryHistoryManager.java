@@ -10,22 +10,14 @@ import java.util.Map;
 public class InMemoryHistoryManager implements HistoryManageable {
     private Node<Task> lastNode;
     private Node<Task> firstNode;
-    private List<Task> printHistoryList = new ArrayList<>();
+    private final List<Task> printHistoryList = new ArrayList<>();
     private final Map<Integer, Node<Task>> historyMap = new HashMap<>();
 
     @Override
     public List<Task> getHistoryList() {
         return getTasks();
     }
-    @Override
-    public List<Task> getPrintHistoryList() {
-        return printHistoryList;
-    }
 
-    @Override
-    public void setPrintHistoryList(List<Task> printHistoryList) {
-        this.printHistoryList = printHistoryList;
-    }
     @Override
     public void remove(int id) {
         removeNode(id);
