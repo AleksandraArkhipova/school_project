@@ -78,14 +78,8 @@ public class InMemoryHistoryManager implements HistoryManageable {
 
         Node<Task> nodeForCycle = firstNode;
 
-        if (firstNode != null) {
-            printHistoryList.add(firstNode.getData());
-        } // поправила по ревью к 5 спринту
-
         while (nodeForCycle != null) {
-            if (nodeForCycle != firstNode) {
-                printHistoryList.add(nodeForCycle.getData());
-            }
+            printHistoryList.add(nodeForCycle.getData());
             nodeForCycle = nodeForCycle.next;
         }
 

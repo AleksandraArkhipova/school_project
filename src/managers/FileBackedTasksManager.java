@@ -12,7 +12,8 @@ import java.util.*;
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManageable {
 
     FileBackedTasksManager(File file) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(file.getName(), StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file.getName(),
+                StandardCharsets.UTF_8))) {
 
             String line = "";
             StringBuilder sb = new StringBuilder(line);
@@ -28,20 +29,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void addSubTask(SubTask subtask, int id) {
-        super.addSubTask(subtask, -1);
+    public void addSubTask(SubTask subtask) {
+        super.addSubTask(subtask);
         save();
     }
 
     @Override
-    public void addEpic(Epic epic, int id) {
-        super.addEpic(epic,-1);
+    public void addEpic(Epic epic) {
+        super.addEpic(epic);
         save();
     }
 
     @Override
-    public void addTask(Task task, int id) {
-        super.addTask(task,-1);
+    public void addTask(Task task) {
+        super.addTask(task);
         save();
     }
 
@@ -100,6 +101,34 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         save();
     }
 
+    @Override
+    public Task getTaskById(int id) {
+        Task task = super.getTaskById(id);
+        save();
+        return task;
+    }
+
+    @Override
+    public SubTask getSubTaskById(int id) {
+        SubTask subTask = super.getSubTaskById(id);
+        save();
+        return subTask;
+    }
+
+    @Override
+    public Epic getEpicById(int id) {
+        Epic epic = super.getEpicById(id);
+        save();
+        return epic;
+    }
+
+    @Override
+    public List<Integer> getSubtasksByEpicId(int epicId) {
+        List<Integer> listOfSubtasks = super.getSubtasksByEpicId(epicId);
+        save();
+        return listOfSubtasks;
+    }
+
     private void save() {
 
         try (FileWriter fileWriter = new FileWriter("FileBackedTasksManager.csv", true)) {
@@ -117,41 +146,43 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private Map<Integer, Task> tasksFromString(String str) {
         Map<Integer, Task> map = new HashMap<>();
-        Task element;
-        TaskStatuses taskStatus;
+
         String[] lines = str.split("\n");
-
+        TaskStatuses taskStatus;
         for (String line : lines) {
+            if (line != "") {
+                try {
+                    Task element;
+                    String[] elements = line.split(",");
 
-                    try {
-                        String[] elements = line.split(",");
-                        taskStatus = TaskStatuses.valueOf(elements[3]);
-                        String type = elements[1];
-                        int id = Integer.parseInt(elements[0]);
-                        String title = elements[2];
-                        String description = elements[4];
+                    taskStatus = TaskStatuses.valueOf(elements[3]);
+                    TaskTypes type = TaskTypes.valueOf(elements[1]);
+                    int id = Integer.parseInt(elements[0]);
+                    String title = elements[2];
+                    String description = elements[4];
 
-                        switch (type) {
+                    switch (type) {
 
-                            case "TASK":
-                                element = new Task(title, TaskTypes.TASK, description, taskStatus, id);
-                                break;
-                            case "SUBTASK":
-                                int epicId = Integer.parseInt(elements[5]);
-                                element = new SubTask(title, TaskTypes.SUBTASK, description, taskStatus, id, epicId);
-                                break;
-                            case "EPIC":
-                                element = new Epic(title, TaskTypes.EPIC, description, id);
-                                element.setStatus(taskStatus);
-                                break;
-                            default:
-                                continue;
-                        }
-                        map.put(element.getId(), element);
-
-                    } catch (Throwable e) {
-                        continue;
+                        case TASK:
+                            element = new Task(title, description, taskStatus, id);
+                            break;
+                        case SUBTASK:
+                            int epicId = Integer.parseInt(elements[5]);
+                            element = new SubTask(title, description, taskStatus, id, epicId);
+                            break;
+                        case EPIC:
+                            element = new Epic(title, description, id);
+                            element.setStatus(taskStatus);
+                            break;
+                        default:
+                            continue;
                     }
+                    map.put(element.getId(), element);
+
+                } catch (RuntimeException exc) {
+                    continue;
+                }
+            }
         }
         return map;
     }
@@ -210,31 +241,31 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
         int maxId = 0;
         for (Task element : mapOfTasks.values()) {
-
             if (element.getId() > maxId) {
                 maxId = element.getId();
             }
-                TaskTypes taskType = element.getType();
-                switch (taskType) {
-                    case EPIC:
-                        addEpic((Epic) element, element.getId());
-                        break;
-                    case TASK:
-                        addTask(element, element.getId());
-                        break;
-                    case SUBTASK:
-                        addSubTask((SubTask) element, element.getId());
-                        break;
-                }
-        }
-        super.uniqueId = maxId;
-
-        if (!listOfIds.isEmpty() && !mapOfTasks.isEmpty()) {
-            for (Integer id : listOfIds) {
-                if (mapOfTasks.containsKey(id)) {
-                    historyManager.add(mapOfTasks.get(id));
-                }
+            TaskTypes taskType = element.getType();
+            switch (taskType) {
+                case EPIC:
+                    epics.put(element.getId(), (Epic) element);
+                    break;
+                case TASK:
+                    tasks.put(element.getId(), element);
+                    break;
+                case SUBTASK:
+                    subtasks.put(element.getId(), (SubTask) element);
+                    break;
             }
+        }
+        for (SubTask subTask : subtasks.values()) {
+            Epic epic = epics.get(subTask.getEpicId());
+            epic.addSubtask(subTask.getId());
+        }
+
+        uniqueId = maxId;
+
+        for (Integer id : listOfIds) {
+            historyManager.add(mapOfTasks.get(id));
         }
     }
 }

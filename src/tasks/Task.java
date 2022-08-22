@@ -10,9 +10,9 @@ public class Task {
     protected TaskStatuses status;
     protected TaskTypes type;
 
-    public Task(String title, TaskTypes type, String description, TaskStatuses status, int id) {
+    public Task(String title, String description, TaskStatuses status, int id) {
         this.title = title;
-        this.type = type;
+        this.type = TaskTypes.TASK;
         this.description = description;
         this.status = status;
         this.id = id;
@@ -39,9 +39,7 @@ public class Task {
 
     @Override
     public String toString() {
-        String type = this.getClass().toString().toUpperCase()
-                .replace("CLASS TASKS.", "");
 
-        return id + "," + type + "," + title + "," + status + "," + description + ",";
+        return id + "," + type.toString() + "," + title + "," + status + "," + description + ",";
     }
 }

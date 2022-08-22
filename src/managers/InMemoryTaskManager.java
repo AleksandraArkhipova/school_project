@@ -14,9 +14,9 @@ public class InMemoryTaskManager implements TaskManageable {
 
     protected int uniqueId = 0;
 
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, SubTask> subtasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
 
     protected final HistoryManageable historyManager = Managers.getDefaultHistory();
 
@@ -94,38 +94,38 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public void addTask(Task task, int id) {
-        if (id == -1) {
-            id = generateId();
+    public void addTask(Task task) {
+        if (task.getId() == 0) {
+            int id = generateId();
+            task.setId(id);
         }
-        task.setId(id);
-        tasks.put(id, task);
+        tasks.put(task.getId(), task);
     }
 
     @Override
-    public void addSubTask(SubTask subtask, int id) {
+    public void addSubTask(SubTask subtask) {
 
-        if (id == -1) {
-            id = generateId();
+        if (subtask.getId() == 0) {
+            int id = generateId();
+            subtask.setId(id);
         }
-        subtask.setId(id);
-        subtasks.put(id, subtask);
+        subtasks.put(subtask.getId(), subtask);
 
         Epic epic = getEpic(subtask.getEpicId());
-            if(epic != null) {
-            epic.addSubtask(id);
+        if (epic != null) {
+            epic.addSubtask(subtask.getId());
             setEpicStatus(subtask.getEpicId());
         }
     }
 
     @Override
-    public void addEpic(Epic epic, int id) {
-        if (id == -1) {
-            id = generateId();
+    public void addEpic(Epic epic) {
+        if (epic.getId() == 0) {
+            int id = generateId();
+            epic.setId(id);
         }
-        epic.setId(id);
         epic.setStatus(NEW);
-        epics.put(id, epic);
+        epics.put(epic.getId(), epic);
     }
 
     @Override
@@ -190,8 +190,8 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public ArrayList<Integer> getSubtasksByEpicId(int epicId) {
-        ArrayList<Integer> listOfSubtasks = getEpic(epicId).getSubTasksList();
+    public List<Integer> getSubtasksByEpicId(int epicId) {
+        List<Integer> listOfSubtasks = getEpic(epicId).getSubTasksList();
         for (Integer id : listOfSubtasks) {
             historyManager.add(subtasks.get(id));
         }

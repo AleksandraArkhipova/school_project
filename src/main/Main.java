@@ -7,7 +7,6 @@ import managers.*;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
-import tasks.TaskTypes;
 
 @SuppressWarnings("InfiniteLoopStatement")
 
@@ -20,27 +19,23 @@ public class Main {
                 "src", "FileBackedTasksManager.csv"));
         Task task1 = new Task(
                 "Забрать посылку с почты",
-                TaskTypes.TASK,
                 "До 15.06.22",
                 TaskStatuses.NEW,
                 0);
 
         Task task2 = new Task(
                 "Пропылесосить квартиру",
-                TaskTypes.TASK,
                 "До 13.06.22",
                 TaskStatuses.NEW,
                 0);
 
         Epic epic1 = new Epic(
                 "Получить полётный сертификат для кота",
-                TaskTypes.EPIC,
                 "Действует 3 дня",
                 0);
 
         SubTask subtask1 = new SubTask(
                 "Сделать прививку от бешенства",
-                TaskTypes.SUBTASK,
                 "Не забыть про штамп!",
                 TaskStatuses.NEW,
                 0,
@@ -48,7 +43,6 @@ public class Main {
 
         SubTask subtask2 = new SubTask(
                 "Пройти ветконтроль в аэропорту",
-                TaskTypes.SUBTASK,
                 "Приехать за 3 часа до вылета",
                 TaskStatuses.DONE,
                 0,
@@ -56,7 +50,6 @@ public class Main {
 
         SubTask subtask3 = new SubTask(
                 "Сесть в самолёт",
-                TaskTypes.SUBTASK,
                 "Переноску можно поставить на колени",
                 TaskStatuses.NEW,
                 0,
@@ -64,7 +57,6 @@ public class Main {
 
         Epic epic2 = new Epic(
                 "Подготовить велосипед к сезону",
-                TaskTypes.EPIC,
                 "Перед выходными",
                 0);
 
@@ -77,19 +69,19 @@ public class Main {
             userInput = scanner.nextInt();
             if (userInput == 1) {
 
-                taskManager.addTask(task1, -1);
+                taskManager.addTask(task1);
 
-                taskManager.addTask(task2, -1);
+                taskManager.addTask(task2);
 
-                taskManager.addEpic(epic1, -1);
+                taskManager.addEpic(epic1);
 
-                taskManager.addEpic(epic2, -1);
+                taskManager.addEpic(epic2);
 
-                taskManager.addSubTask(subtask1, -1);
+                taskManager.addSubTask(subtask1);
 
-                taskManager.addSubTask(subtask2, -1);
+                taskManager.addSubTask(subtask2);
 
-                taskManager.addSubTask(subtask3, -1);
+                taskManager.addSubTask(subtask3);
 
             } else if (userInput == 2) {
 
@@ -138,20 +130,17 @@ public class Main {
 
                 task1 = new Task(
                         "Забрать посылку с почты",
-                        TaskTypes.TASK,
                         "До 20.06.22",
                         TaskStatuses.DONE,
                         task1.getId());
 
                 epic1 = new Epic(
                         "Получить ветеринарный сертификат для кота",
-                        TaskTypes.EPIC,
                         "До конца августа",
                         epic1.getId());
 
                 subtask1 = new SubTask(
                         "Сделать прививку от бешенства",
-                        TaskTypes.SUBTASK,
                         "Не забыть про штамп!",
                         TaskStatuses.NEW,
                         subtask1.getId(),
