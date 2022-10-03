@@ -2,11 +2,16 @@ package tasks;
 
 import managers.TaskStatuses;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private final int epicId;
 
-    public SubTask(String title, String description, TaskStatuses status, int id, int epicId) {
-        super(title, description, status, id);
+    public SubTask(String title, String description, TaskStatuses status,
+                   Duration duration, LocalDateTime startTime, int epicId) {
+        super(title, description, status, duration, startTime );
+        this.id = 0;
         this.epicId = epicId;
         this.type = TaskTypes.SUBTASK;
     }
@@ -24,7 +29,6 @@ public class SubTask extends Task {
     @Override
     public String toString() {
 
-        return super.toString() + epicId;
-        //[5] = epicId
+        return super.toString() + "," + epicId;
     }
 }
