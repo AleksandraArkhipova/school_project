@@ -44,7 +44,7 @@ public interface TaskManageable {
 
     void removeEpicById(int epicId);
 
-    List<Integer> getSubtasksByEpicId(int epicId);
+    List<Task> getSubtasksByEpicId(int epicId);
 
     List<Task> getHistory();
 

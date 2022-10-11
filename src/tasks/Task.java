@@ -1,6 +1,7 @@
 package tasks;
 
 import managers.TaskStatuses;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -14,7 +15,7 @@ public class Task {
     protected TaskStatuses status;
     protected TaskTypes type;
     protected Duration duration;
-    public LocalDateTime startTime;
+    protected LocalDateTime startTime;
     protected LocalDateTime endTime;
 
 
@@ -59,11 +60,12 @@ public class Task {
         return startTime;
     }
 
-    public LocalDateTime calculateEndTimeForTaskOrSubtask() {
+    public void setEndTimeForTaskOrSubtask() {
         if (startTime != null && duration != null) {
-            return startTime.plusMinutes(duration.toMinutes());
+            this.endTime = startTime.plusMinutes(duration.toMinutes());
+        } else {
+            this.endTime = LocalDateTime.of(2022, JANUARY, 1, 0, 0);
         }
-        return LocalDateTime.of(2022, JANUARY, 1, 0, 0);
     }
 
     public LocalDateTime getEndTime() {

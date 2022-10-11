@@ -12,9 +12,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManageable {
+public class FileBackedTasksManager
+        extends InMemoryTaskManager implements TaskManageable {
 
-    FileBackedTasksManager(File file) throws IOException {
+    private final File file;
+
+    public FileBackedTasksManager(File file) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(file.getName(),
                 StandardCharsets.UTF_8))) {
 
@@ -29,6 +32,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 recoverDataIntoManager(line);
             }
         }
+        this.file = file;
     }
 
     @Override
@@ -126,8 +130,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public List<Integer> getSubtasksByEpicId(int epicId) {
-        List<Integer> listOfSubtasks = super.getSubtasksByEpicId(epicId);
+    public List<Task> getSubtasksByEpicId(int epicId) {
+        List<Task> listOfSubtasks = super.getSubtasksByEpicId(epicId);
         save();
         return listOfSubtasks;
     }
@@ -155,38 +159,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private void save() {
 
-        try (FileWriter fileWriter = new FileWriter("FileBackedTasksManager.csv", true)) {
+        try (FileWriter fileWriter = new FileWriter(file, false)) {
 
-            PrintWriter writer = new PrintWriter("FileBackedTasksManager.csv");
-            writer.print("");
-            writer.close();
-            /** Вернула PrintWriter, объясняю:
-             При вызове метода save() файл стирается и наполняется актуальными данными заново.
-             Таким образом его внешний вид приводится к тз, где:
-             "актуальные добавленные таски,
-             \n
-             история, выраженная в идентификаторах"
-
-             Если не стирать наполнение файла, тогда нужно делать отдельные реализации save()
-             для вызовов методов добавления\просмотра одной задачи и
-             для методов добавления/просмотра нескольких задач.
-             При такой реализации появляется сложность с историей просмотров, которая должна отображаться
-             в файлике последней.
-             Если не стирать наполнение файла и при этом вызывать метод просмотра истории
-             несколько раз во время работы программы, внешний вид файлика будет такой:
-             "актуальные добавленные таски,
-             \n
-             история, выраженная в идентификаторах",
-             "актуальные добавленные таски,
-             \n
-             история, выраженная в идентификаторах"
-             ...
-             **/
             fileWriter.write("id,type,name,status,description,duration,startTime,endTime,epic\n");//печать шапки
-            fileWriter.write(tasksToString());//добавление в файл актуальных данных по таскам
+            fileWriter.write(tasksToString());
             fileWriter.write("\n");
             if (historyManager.getHistoryList() != null) {
-                fileWriter.write(historyToString(historyManager));//добавление в файл актуальных данных истории просмотров
+                fileWriter.write(historyToString(historyManager));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения!", e);
@@ -253,51 +232,34 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private static String historyToString(HistoryManageable manager) {
         List<Task> historyList = manager.getHistoryList();
-        StringBuilder sb = new StringBuilder();
-
-        historyList.stream()
+        return historyList.stream()
                 .map(Task::getId)
-                .map(x -> x + ",")
-                .forEach(sb::append);
-        if (sb.length() > 0) {
-            sb.setLength(sb.length() - 1);
-        }
-        return sb.toString();
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
     }
 
     private String tasksToString() {
         StringBuilder sb = new StringBuilder();
 
-        Map<Integer, Task> map = new HashMap<>(tasks);
-        map.putAll(subtasks);
-        map.putAll(epics);
+        Map<Integer, Task> map = new HashMap<>(tasksMap);
+        map.putAll(subtasksMap);
+        map.putAll(epicsMap);
 
         for (Task element : map.values()) {
-            sb.append(element + "\n");
+            sb.append(element).append("\n");
         }
         return sb.toString();
     }
 
     private static List<Integer> historyFromString(String str) {
-        List<Integer> list = new ArrayList<>();
         String[] lines = str.split("\n");
-        for (String line : lines) {
-            if (!line.isEmpty()) {
-                line = line.trim();
-                String[] parts = line.split(",");
-                boolean isRequiredLine = Arrays.stream(parts).noneMatch(part -> part.startsWith("T")
-                        || part.startsWith("E")
-                        || part.startsWith("S")
-                        || part.startsWith("id")
-                );
-                if (isRequiredLine) {
-                    Arrays.stream(parts)
-                            .mapToInt(part -> Integer.parseInt(part))
-                            .forEach(list::add);
-                }
-            }
-        }
-        return list;
+        return Arrays.stream(lines)
+                .skip(lines.length - 1)
+                .filter(s -> !s.isEmpty())
+                .flatMap(s -> Arrays.stream(s.split(",")))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
     }
 
     public static FileBackedTasksManager loadFromFile(File file) throws IOException {
@@ -317,20 +279,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             TaskTypes taskType = element.getType();
             switch (taskType) {
                 case EPIC:
-                    epics.put(element.getId(), (Epic) element);
+                    epicsMap.put(element.getId(), (Epic) element);
                     break;
                 case TASK:
-                    tasks.put(element.getId(), element);
+                    tasksMap.put(element.getId(), element);
                     setOfPrioritizedTasks.add(element);
                     break;
                 case SUBTASK:
-                    subtasks.put(element.getId(), (SubTask) element);
+                    subtasksMap.put(element.getId(), (SubTask) element);
                     setOfPrioritizedTasks.add(element);
                     break;
             }
         }
-        for (SubTask subTask : subtasks.values()) {
-            Epic epic = epics.get(subTask.getEpicId());
+        for (SubTask subTask : subtasksMap.values()) {
+            Epic epic = epicsMap.get(subTask.getEpicId());
             epic.addSubtask(subTask.getId());
         }
 

@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
-
 import static java.util.Calendar.JUNE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -150,8 +149,8 @@ class TaskManagerTest {
                 "test4_Task_description",
                 TaskStatuses.NEW,
                 Duration.ofHours(1),
-                LocalDateTime.of(2022, JUNE,
-                        3, 12, 0)); //id8
+                LocalDateTime.of(2022, Month.APRIL,
+                        1, 12, 0)); //id8
         taskManager.addTask(task3);
 
         subtask4 = new SubTask("test4_SubTask",
@@ -237,7 +236,7 @@ class TaskManagerTest {
             + "THEN the actual collection of subtasks")
     @Test
     void test7_getSubtasksByEpicId() {
-        List<Integer> list = taskManager.getSubtasksByEpicId(3);
+        List<Task> list = taskManager.getSubtasksByEpicId(3);
 
         assertEquals(3, list.size(),
                 "Неверное количество подзадач для эпика с id 3");
@@ -262,7 +261,7 @@ class TaskManagerTest {
         taskManager.getTaskById(1);
         taskManager.getTaskById(1);
         historyList = taskManager.getHistory();
-        assertTrue(size + 1 == historyList.size(), "Элементы дублируются.");
+        assertEquals(size + 1, historyList.size(), "Элементы дублируются.");
 
         taskManager.removeAllSubTasks();
         taskManager.removeAllTasks();
@@ -273,34 +272,79 @@ class TaskManagerTest {
     }
 
     @DisplayName("GIVEN a new instance of TaskManager"
-            + "WHEN method .setEpicStatusAfterSubtaskAddedOrUpdated is called"
-            + "THEN epics status changes")
+            + "WHEN subtasks added/updated"
+            + "THEN epics parameters change")
     @Test
-    void test9_shouldChangeEpicStatus() {
+    void test9_shouldChangeEpicParameters() {
 
-        assertTrue(taskManager.getEpicById(3).getStatus() == TaskStatuses.IN_PROGRESS,
+        assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.IN_PROGRESS,
                 "Неправильный статус эпика.");
 
-        taskManager.getSubTaskById(5).setStatus(TaskStatuses.DONE);
-        taskManager.getSubTaskById(7).setStatus(TaskStatuses.DONE);
-        taskManager.setEpicStatusAfterSubtaskAddedOrUpdated(3);
-        assertTrue(taskManager.getEpicById(3).getStatus() == TaskStatuses.DONE,
+        taskManager.updateSubTask(new SubTask(
+                "Сделать прививку от бешенства",
+                "Не забыть про штамп!",
+                TaskStatuses.DONE,
+                Duration.ofHours(3),
+                LocalDateTime.of(2022, JUNE,
+                        22, 10, 0), 3), 5);
+        taskManager.updateSubTask(new SubTask(
+                "Сесть в самолёт",
+                "Переноску можно поставить на колени",
+                TaskStatuses.DONE,
+                Duration.ofHours(1),
+                LocalDateTime.of(2022, JUNE,
+                        25, 10, 0), 3), 7);
+
+        assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.DONE,
                 "Неправильный статус эпика.");
 
-        taskManager.getSubTaskById(5).setStatus(TaskStatuses.NEW);
-        taskManager.getSubTaskById(6).setStatus(TaskStatuses.NEW);
-        taskManager.getSubTaskById(7).setStatus(TaskStatuses.NEW);
-        taskManager.setEpicStatusAfterSubtaskAddedOrUpdated(3);
-        assertTrue(taskManager.getEpicById(3).getStatus() == TaskStatuses.NEW,
+        taskManager.updateSubTask(new SubTask(
+                "Сделать прививку от бешенства",
+                "Не забыть про штамп!",
+                TaskStatuses.NEW,
+                Duration.ofHours(3),
+                LocalDateTime.of(2022, JUNE,
+                        22, 10, 0), 3), 5);
+        taskManager.updateSubTask(new SubTask(
+                "Пройти ветконтроль в аэропорту",
+                "Приехать за 3 часа до вылета",
+                TaskStatuses.NEW,
+                Duration.ofHours(2),
+                LocalDateTime.of(2022, JUNE,
+                        25, 5, 0), 3), 6);
+        taskManager.updateSubTask(new SubTask(
+                "Сесть в самолёт",
+                "Переноску можно поставить на колени",
+                TaskStatuses.NEW,
+                Duration.ofHours(1),
+                LocalDateTime.of(2022, JUNE,
+                        25, 10, 0), 3), 7);
+        assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.NEW,
                 "Неправильный статус эпика.");
 
-        taskManager.getSubTaskById(5).setStatus(TaskStatuses.IN_PROGRESS);
-        taskManager.setEpicStatusAfterSubtaskAddedOrUpdated(3);
-        assertTrue(taskManager.getEpicById(3).getStatus() == TaskStatuses.IN_PROGRESS,
+        taskManager.updateSubTask(new SubTask(
+                "Сделать прививку от бешенства",
+                "Не забыть про штамп!",
+                TaskStatuses.IN_PROGRESS,
+                Duration.ofHours(3),
+                LocalDateTime.of(2022, JUNE,
+                        22, 10, 0), 3), 5);
+        assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.IN_PROGRESS,
                 "Неправильный статус эпика.");
+
+        assertEquals(LocalDateTime.of(2022, JUNE,
+                        22, 10, 0), taskManager.getEpicById(3).getStartTime(),
+                "Неправильно рассчитан startTime.");
+
+        assertEquals(LocalDateTime.of(2022, JUNE,
+                        25, 11, 0), taskManager.getEpicById(3).getEndTime(),
+                "Неправильно рассчитан endTime");
+
+        assertEquals(Duration.ofSeconds(14400), taskManager.getEpicById(3).getDuration(),
+                "Неправильно рассчитан duration");
 
         taskManager.removeAllSubTasks();
-        assertTrue(taskManager.getEpicById(3).getStatus() == TaskStatuses.NEW,
+        assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.NEW,
                 "Неправильный статус эпика.");
     }
 }
