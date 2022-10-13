@@ -49,20 +49,17 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     public Boolean checkIfTaskIntersection(Task element) {
-        boolean isTakenInterSpace = false;
-        LocalDateTime dateTimeToCheck = element.getStartTime();
+
+        LocalDateTime timeInterval = element.getStartTime();
         for (int i = 0; i < element.getDuration().toMinutes() / 15; i++) {
-            isTakenInterSpace = timeIntersectionMap.containsKey(dateTimeToCheck);
-            dateTimeToCheck = dateTimeToCheck.plusMinutes(15);
-            /**
-             * здесь задумка была такая: при каждой итерации в цикле
-             * (число итераций по количеству 15-минутных отрезков длительности таски/сабтаски)
-             * проверяется наличие определённой ДатыВремени в мапе
-             * после проверки Старттайм таски/сабтаски на наличие в мапе
-             * Старттайм сдвигается на 15 минут вперёд для следующей итерации
-             */
+            boolean isContainTimeInterval =
+                    timeIntersectionMap.containsKey(timeInterval);
+            if (isContainTimeInterval) {
+                throw new TaskTimeValidationException("An intersection has found");
+            }
+            timeInterval = timeInterval.plusMinutes(15);
         }
-        return isTakenInterSpace;
+        return false;
     }
 
     private void putInTimeIntersectionMap(Task element) {
@@ -83,10 +80,6 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     private void changeEpicsDateTimeParametersWhenSubtasksAddedChangedOrDeleted(int epicId) {
-/**
- * соединила методы по расчёту старт, энд тайм & длительности в один
- * так как они используются только вместе
- */
         Epic epic = getEpic(epicId);
         boolean anySubtasksInList = !epic.getSubTasksList().isEmpty();
         if (anySubtasksInList) {
@@ -95,11 +88,13 @@ public class InMemoryTaskManager implements TaskManageable {
                     .sorted(Comparator.comparing(Task::getStartTime))
                     .collect(Collectors.toCollection(LinkedList::new));
 
-            epic.setStartTime(list.getFirst().getStartTime());
-            epic.setEndTime(list.getLast().getEndTime());
+            LocalDateTime start = list.getFirst().getStartTime();
+            LocalDateTime end = list.getLast().getEndTime();
 
-            Duration duration = list.getFirst().getDuration()
-                    .plus(list.getLast().getDuration());
+            epic.setStartTime(start);
+            epic.setEndTime(end);
+
+            Duration duration = Duration.between(start, end);
             epic.setDuration(duration);
         } else {
             epic.setStartTime(null);
@@ -122,6 +117,7 @@ public class InMemoryTaskManager implements TaskManageable {
             for (Task task : tasksMap.values()) {
                 historyManager.remove(task.getId());
                 setOfPrioritizedTasks.remove(task);
+                removeFromTimeIntersectionMap(task);
             }
             tasksMap.clear();
 
@@ -134,6 +130,7 @@ public class InMemoryTaskManager implements TaskManageable {
             for (Task subtask : subtasksMap.values()) {
                 historyManager.remove(subtask.getId());
                 setOfPrioritizedTasks.remove(subtask);
+                removeFromTimeIntersectionMap(subtask);
             }
             subtasksMap.clear();
 
@@ -177,9 +174,7 @@ public class InMemoryTaskManager implements TaskManageable {
     public void addTask(Task task) {
 
         try {
-            if (checkIfTaskIntersection(task)) {
-                throw new TaskTimeValidationException("Task time intersection!");
-            }
+            checkIfTaskIntersection(task);
             if (task.getId() == 0) {
                 int id = generateId();
                 task.setId(id);
@@ -188,7 +183,6 @@ public class InMemoryTaskManager implements TaskManageable {
             if (!tasksMap.containsKey(task.getId())) {
                 task.setEndTimeForTaskOrSubtask();
                 tasksMap.put(task.getId(), task);
-                setOfPrioritizedTasks.remove(tasksMap.get(task.getId()));
                 setOfPrioritizedTasks.add(task);
                 putInTimeIntersectionMap(task);
             }
@@ -200,9 +194,7 @@ public class InMemoryTaskManager implements TaskManageable {
     @Override
     public void addSubTask(SubTask subtask) {
         try {
-            if (checkIfTaskIntersection(subtask)) {
-                throw new TaskTimeValidationException("Subtask time intersection!");
-            }
+            checkIfTaskIntersection(subtask);
 
             if (subtask.getId() == 0) {
                 int id = generateId();
@@ -214,7 +206,6 @@ public class InMemoryTaskManager implements TaskManageable {
 
                 subtask.setEndTimeForTaskOrSubtask();
                 subtasksMap.put(subtask.getId(), subtask);
-                setOfPrioritizedTasks.remove(subtasksMap.get(subtask.getId()));
                 setOfPrioritizedTasks.add(subtask);
                 putInTimeIntersectionMap(subtask);
 
@@ -244,16 +235,17 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public void updateTask(Task task, int taskId) {
+    public void updateTask(Task task) {
         try {
+            int taskId = task.getId();
             if (tasksMap.containsKey(taskId)) {
                 removeFromTimeIntersectionMap(tasksMap.remove(taskId));
-                if (checkIfTaskIntersection(task)) {
-                    throw new TaskTimeValidationException("Task time intersection!");
-                }
-                task.setId(taskId);
+                checkIfTaskIntersection(task);
+
                 task.setEndTimeForTaskOrSubtask();
+
                 tasksMap.put(taskId, task);
+
                 setOfPrioritizedTasks.remove(tasksMap.get(taskId));
                 setOfPrioritizedTasks.add(task);
 
@@ -265,28 +257,23 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public void updateSubTask(SubTask subtask, int subtaskId) {
-        /**
-         * Николай, комментирую насчёт второго аргумента в апдейт методах. Ты писал в последнем ревью к 6 спринту:
-         * "id лучше не передавать в конструктор, по умолчанию в конструкторе устанавливать -1 или 0."
-         * Я сделала такую реализацию: при апдейте в метод передаётся новый объект с id 0
-         * Тогда такой вопрос: если не передавать в метод верный id вторым аргументом, откуда ещё его можно получить?
-         */
+    public void updateSubTask(SubTask subtask) {
 
         try {
-            removeFromTimeIntersectionMap(subtasksMap.remove(subtaskId));
-
-            if (checkIfTaskIntersection(subtask)) {
-                throw new TaskTimeValidationException("Subtask time intersection!");
-            }
+            int subtaskId = subtask.getId();
             int epicId = subtask.getEpicId();
 
-            if (epicsMap.containsKey(epicId)) {
-                subtask.setId(subtaskId);
+            if (epicsMap.containsKey(epicId) && subtasksMap.containsKey(subtaskId)) {
+                removeFromTimeIntersectionMap(subtasksMap.remove(subtaskId));
+                checkIfTaskIntersection(subtask);
+
                 subtask.setEndTimeForTaskOrSubtask();
+
                 subtasksMap.put(subtaskId, subtask);
+
                 setOfPrioritizedTasks.remove(subtasksMap.get(subtaskId));
                 setOfPrioritizedTasks.add(subtask);
+
                 putInTimeIntersectionMap(subtask);
 
                 setEpicStatusAfterSubtaskAddedOrUpdated(epicId);
@@ -298,7 +285,8 @@ public class InMemoryTaskManager implements TaskManageable {
     }
 
     @Override
-    public void updateEpic(Epic epic, int epicId) {
+    public void updateEpic(Epic epic) {
+        int epicId = epic.getId();
         if (epicsMap.containsKey(epicId)) {
             epic.setId(epicId);
             epic.setDuration(epicsMap.get(epicId).getDuration());
@@ -348,6 +336,7 @@ public class InMemoryTaskManager implements TaskManageable {
                 for (int subtaskId : epic.getSubTasksList()) {
                     subtasksMap.remove(subtaskId);
                     setOfPrioritizedTasks.remove(subtasksMap.get(subtaskId));
+                    removeFromTimeIntersectionMap(subtasksMap.get(subtaskId));
                     historyManager.remove(subtaskId);
                 }
                 epic.clearSubtasksList();
@@ -375,11 +364,7 @@ public class InMemoryTaskManager implements TaskManageable {
 
     }
 
-    public void setEpicStatusAfterSubtaskAddedOrUpdated(int epicId) {
-/**когда я делаю этот метод приватным,
- * я не могу его вызвать от экземпляра менеджера
- * в классе TaskManagerTest
- */
+    private void setEpicStatusAfterSubtaskAddedOrUpdated(int epicId) {
         Epic epic = getEpic(epicId);
         if (epic != null && epic.isContainSubtasks()) {
 

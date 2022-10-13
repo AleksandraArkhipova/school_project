@@ -63,9 +63,15 @@ public class Task {
     public void setEndTimeForTaskOrSubtask() {
         if (startTime != null && duration != null) {
             this.endTime = startTime.plusMinutes(duration.toMinutes());
-        } else {
-            this.endTime = LocalDateTime.of(2022, JANUARY, 1, 0, 0);
         }
+
+        /**
+         *
+         * "Почему январь 2022?=)"
+         *
+         * я думала, дефолтная дата будет лучше, чем null =)
+         *
+         */
     }
 
     public LocalDateTime getEndTime() {

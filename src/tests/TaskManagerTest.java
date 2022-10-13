@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
+
 import static java.util.Calendar.JUNE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -202,10 +204,13 @@ class TaskManagerTest {
                 Duration.ofHours(1),
                 LocalDateTime.of(2022, JUNE, 23, 10, 0),
                 3);
+        task1.setId(1);
+        subtask1.setId(5);
+        epic1.setId(3);
 
-        taskManager.updateTask(task1, 1);
-        taskManager.updateSubTask(subtask1, 5);
-        taskManager.updateEpic(epic1, 3);
+        taskManager.updateTask(task1);
+        taskManager.updateSubTask(subtask1);
+        taskManager.updateEpic(epic1);
 
         assertEquals(task1, taskManager.getTaskById(1), "Задачи не совпадают.");
         assertEquals(subtask1, taskManager.getSubTaskById(5), "Подзадачи не совпадают");
@@ -279,56 +284,70 @@ class TaskManagerTest {
 
         assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.IN_PROGRESS,
                 "Неправильный статус эпика.");
-
-        taskManager.updateSubTask(new SubTask(
+        SubTask subTaskWithId5ForUpdate = new SubTask(
                 "Сделать прививку от бешенства",
                 "Не забыть про штамп!",
                 TaskStatuses.DONE,
                 Duration.ofHours(3),
                 LocalDateTime.of(2022, JUNE,
-                        22, 10, 0), 3), 5);
-        taskManager.updateSubTask(new SubTask(
+                        22, 10, 0), 3);
+        subTaskWithId5ForUpdate.setId(5);
+        taskManager.updateSubTask(subTaskWithId5ForUpdate);
+
+        SubTask subTaskWithId7ForUpdate = new SubTask(
                 "Сесть в самолёт",
                 "Переноску можно поставить на колени",
                 TaskStatuses.DONE,
                 Duration.ofHours(1),
                 LocalDateTime.of(2022, JUNE,
-                        25, 10, 0), 3), 7);
+                        25, 10, 0), 3);
+        subTaskWithId7ForUpdate.setId(7);
+        taskManager.updateSubTask(subTaskWithId7ForUpdate);
 
         assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.DONE,
                 "Неправильный статус эпика.");
 
-        taskManager.updateSubTask(new SubTask(
+        subTaskWithId5ForUpdate = new SubTask(
                 "Сделать прививку от бешенства",
                 "Не забыть про штамп!",
                 TaskStatuses.NEW,
                 Duration.ofHours(3),
                 LocalDateTime.of(2022, JUNE,
-                        22, 10, 0), 3), 5);
-        taskManager.updateSubTask(new SubTask(
+                        22, 10, 0), 3);
+        subTaskWithId5ForUpdate.setId(5);
+        taskManager.updateSubTask(subTaskWithId5ForUpdate);
+
+        SubTask subTaskWithId6ForUpdate = new SubTask(
                 "Пройти ветконтроль в аэропорту",
                 "Приехать за 3 часа до вылета",
                 TaskStatuses.NEW,
                 Duration.ofHours(2),
                 LocalDateTime.of(2022, JUNE,
-                        25, 5, 0), 3), 6);
-        taskManager.updateSubTask(new SubTask(
+                        25, 5, 0), 3);
+        subTaskWithId6ForUpdate.setId(6);
+        taskManager.updateSubTask(subTaskWithId6ForUpdate);
+
+        subTaskWithId7ForUpdate = new SubTask(
                 "Сесть в самолёт",
                 "Переноску можно поставить на колени",
                 TaskStatuses.NEW,
                 Duration.ofHours(1),
                 LocalDateTime.of(2022, JUNE,
-                        25, 10, 0), 3), 7);
+                        25, 10, 0), 3);
+        subTaskWithId7ForUpdate.setId(7);
+        taskManager.updateSubTask(subTaskWithId7ForUpdate);
         assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.NEW,
                 "Неправильный статус эпика.");
 
-        taskManager.updateSubTask(new SubTask(
+        subTaskWithId5ForUpdate = new SubTask(
                 "Сделать прививку от бешенства",
                 "Не забыть про штамп!",
                 TaskStatuses.IN_PROGRESS,
                 Duration.ofHours(3),
                 LocalDateTime.of(2022, JUNE,
-                        22, 10, 0), 3), 5);
+                        22, 10, 0), 3);
+        subTaskWithId5ForUpdate.setId(5);
+        taskManager.updateSubTask(subTaskWithId5ForUpdate);
         assertSame(taskManager.getEpicById(3).getStatus(), TaskStatuses.IN_PROGRESS,
                 "Неправильный статус эпика.");
 
@@ -340,7 +359,7 @@ class TaskManagerTest {
                         25, 11, 0), taskManager.getEpicById(3).getEndTime(),
                 "Неправильно рассчитан endTime");
 
-        assertEquals(Duration.ofSeconds(14400), taskManager.getEpicById(3).getDuration(),
+        assertEquals(Duration.ofHours(73), taskManager.getEpicById(3).getDuration(),
                 "Неправильно рассчитан duration");
 
         taskManager.removeAllSubTasks();

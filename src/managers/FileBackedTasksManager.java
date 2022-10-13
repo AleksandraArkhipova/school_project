@@ -73,20 +73,20 @@ public class FileBackedTasksManager
     }
 
     @Override
-    public void updateTask(Task task, int taskId) {
-        super.updateTask(task, taskId);
+    public void updateTask(Task task) {
+        super.updateTask(task);
         save();
     }
 
     @Override
-    public void updateSubTask(SubTask subtask, int subtaskId) {
-        super.updateSubTask(subtask, subtaskId);
+    public void updateSubTask(SubTask subtask) {
+        super.updateSubTask(subtask);
         save();
     }
 
     @Override
-    public void updateEpic(Epic epic, int epicId) {
-        super.updateEpic(epic, epicId);
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
         save();
     }
 

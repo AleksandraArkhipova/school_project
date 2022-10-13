@@ -32,11 +32,11 @@ public interface TaskManageable {
 
     void addEpic(Epic epic);
 
-    void updateTask(Task task, int id);
+    void updateTask(Task task);
 
-    void updateSubTask(SubTask subtask, int id);
+    void updateSubTask(SubTask subtask);
 
-    void updateEpic(Epic epic, int id);
+    void updateEpic(Epic epic);
 
     void removeTaskById(int taskId);
 
