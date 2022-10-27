@@ -1,11 +1,9 @@
 package tasks;
 
 import managers.TaskStatuses;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
-
-import static java.time.Month.JANUARY;
+import java.util.Objects;
 
 public class Task {
 
@@ -63,15 +61,9 @@ public class Task {
     public void setEndTimeForTaskOrSubtask() {
         if (startTime != null && duration != null) {
             this.endTime = startTime.plusMinutes(duration.toMinutes());
+        } else {
+            this.endTime = LocalDateTime.MAX;
         }
-
-        /**
-         *
-         * "Почему январь 2022?=)"
-         *
-         * я думала, дефолтная дата будет лучше, чем null =)
-         *
-         */
     }
 
     public LocalDateTime getEndTime() {
@@ -90,5 +82,18 @@ public class Task {
     public String toString() {
         return id + "," + type + "," + title + "," + status + "," + description
                 + "," + duration + "," + startTime + "," + endTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id && Objects.equals(title, task.title) && Objects.equals(description, task.description) && status == task.status && type == task.type && Objects.equals(duration, task.duration) && Objects.equals(startTime, task.startTime) && Objects.equals(endTime, task.endTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, description, id, status, type, duration, startTime, endTime);
     }
 }

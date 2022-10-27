@@ -1,5 +1,6 @@
 package managers;
 
+import exceptions.ManagerSaveException;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class FileBackedTasksManager
         extends InMemoryTaskManager implements TaskManageable {
 
-    private final File file;
+    private File file;
 
     public FileBackedTasksManager(File file) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(file.getName(),
@@ -33,6 +34,9 @@ public class FileBackedTasksManager
             }
         }
         this.file = file;
+    }
+
+    public FileBackedTasksManager() {
     }
 
     @Override
@@ -157,7 +161,7 @@ public class FileBackedTasksManager
         return list;
     }
 
-    private void save() {
+    protected void save() {
 
         try (FileWriter fileWriter = new FileWriter(file, false)) {
 

@@ -1,4 +1,4 @@
-package managers;
+package exceptions;
 
 public class TaskTimeValidationException extends RuntimeException {
     public TaskTimeValidationException(String message) {

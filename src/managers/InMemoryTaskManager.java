@@ -1,5 +1,6 @@
 package managers;
 
+import exceptions.TaskTimeValidationException;
 import tasks.*;
 
 import java.time.Duration;
@@ -13,9 +14,9 @@ public class InMemoryTaskManager implements TaskManageable {
 
     protected int uniqueId = 0;
 
-    protected final Map<Integer, Task> tasksMap = new HashMap<>();
-    protected final Map<Integer, SubTask> subtasksMap = new HashMap<>();
-    protected final Map<Integer, Epic> epicsMap = new HashMap<>();
+    protected Map<Integer, Task> tasksMap = new HashMap<>();
+    protected Map<Integer, SubTask> subtasksMap = new HashMap<>();
+    protected Map<Integer, Epic> epicsMap = new HashMap<>();
 
     protected final Set<Task> setOfPrioritizedTasks =
             new TreeSet<>(Comparator.nullsLast(Comparator.comparing(Task::getStartTime)));
@@ -23,7 +24,7 @@ public class InMemoryTaskManager implements TaskManageable {
     private final Map<LocalDateTime, Boolean> timeIntersectionMap =
             new LinkedHashMap<>(15 * 24 * 365);
 
-    protected final HistoryManageable historyManager = Managers.getDefaultHistory();
+    protected HistoryManageable historyManager = Managers.getDefaultHistory();
 
     private int generateId() {
         uniqueId++;
@@ -94,7 +95,9 @@ public class InMemoryTaskManager implements TaskManageable {
             epic.setStartTime(start);
             epic.setEndTime(end);
 
-            Duration duration = Duration.between(start, end);
+            Duration duration = list.stream()
+                    .map(Task::getDuration)
+                    .reduce(Duration.ZERO, Duration::plus);
             epic.setDuration(duration);
         } else {
             epic.setStartTime(null);
@@ -393,6 +396,18 @@ public class InMemoryTaskManager implements TaskManageable {
 
     private Epic getEpic(int epicId) {
         return epicsMap.get(epicId);
+    }
+
+    public Map<Integer, Task> getTasksMap() {
+        return tasksMap;
+    }
+
+    public Map<Integer, SubTask> getSubtasksMap() {
+        return subtasksMap;
+    }
+
+    public Map<Integer, Epic> getEpicsMap() {
+        return epicsMap;
     }
 }
 

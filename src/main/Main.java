@@ -1,16 +1,13 @@
 package main;
 
-import java.io.File;
+import client.KVTaskClient;
+import servers.KVServer;
 import java.io.IOException;
-import managers.*;
+import java.net.http.HttpClient;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
-        TaskManageable taskManager = Managers.getDefault();
-        FileBackedTasksManager backedTasksManager =
-                FileBackedTasksManager.loadFromFile(new File(
-                        "files", "FileBackedTasksManager.csv"));
     }
 }

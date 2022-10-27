@@ -8,6 +8,8 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -36,7 +38,7 @@ class TaskManagerTest {
     @BeforeEach
     void beforeEach() {
 
-        taskManager = Managers.getDefault();
+        taskManager = new InMemoryTaskManager();
         task1 = new Task(
                 "Забрать посылку с почты",
                 "До 15.06.22",
@@ -359,7 +361,7 @@ class TaskManagerTest {
                         25, 11, 0), taskManager.getEpicById(3).getEndTime(),
                 "Неправильно рассчитан endTime");
 
-        assertEquals(Duration.ofHours(73), taskManager.getEpicById(3).getDuration(),
+        assertEquals(Duration.ofHours(6), taskManager.getEpicById(3).getDuration(),
                 "Неправильно рассчитан duration");
 
         taskManager.removeAllSubTasks();
