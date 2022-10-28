@@ -21,7 +21,7 @@ public class InMemoryTaskManager implements TaskManageable {
     protected final Set<Task> setOfPrioritizedTasks =
             new TreeSet<>(Comparator.nullsLast(Comparator.comparing(Task::getStartTime)));
 
-    private final Map<LocalDateTime, Boolean> timeIntersectionMap =
+    protected Map<LocalDateTime, Boolean> timeIntersectionMap =
             new LinkedHashMap<>(15 * 24 * 365);
 
     protected HistoryManageable historyManager = Managers.getDefaultHistory();
@@ -47,6 +47,10 @@ public class InMemoryTaskManager implements TaskManageable {
             historyManager.add(subtask);
         }
         return new ArrayList<>(subtasksMap.values());
+    }
+
+    public Set<Task> getSetOfPrioritizedTasks() {
+        return setOfPrioritizedTasks;
     }
 
     public Boolean checkIfTaskIntersection(Task element) {

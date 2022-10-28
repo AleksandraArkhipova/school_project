@@ -52,32 +52,35 @@ class HTTPTaskManagerTest {
     }
 
     @Test
-    void saveAndGetAllTasks_1() throws IOException, InterruptedException {
+    void saveAndGetAllTasks_1() {
 
         HttpClient client = newBuilder()
                 .version(HTTP_1_1)
                 .build();
         HttpRequest requestForTasks = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8888/api/v1/tasks"))
+                .uri(URI.create("http://localhost:8888/api/v1/tasks/task"))
                 .version(HTTP_1_1)
                 .header("Accept", "application/json")
                 .GET()
                 .build();
+        try {
+            HttpResponse<String> response1 = client.send(
+                    requestForTasks, HttpResponse.BodyHandlers.ofString());
 
-        HttpResponse<String> response1 = client.send(
-                requestForTasks, HttpResponse.BodyHandlers.ofString());
+            assertEquals(200, response1.statusCode());
 
-        assertEquals(200, response1.statusCode());
-
-        Type type = new TypeToken<List<Task>>() {
-        }.getType();
-        List<Task> tasks = gson.fromJson(response1.body(), type);
-        assertNotNull(tasks, "Таски не возвращаются");
+            Type type = new TypeToken<List<Task>>() {
+            }.getType();
+            List<Task> tasks = gson.fromJson(response1.body(), type);
+            assertNotNull(tasks, "Таски не возвращаются");
+        } catch (IOException | InterruptedException e) {
+            fail();
+        }
 
     }
 
     @Test
-    void saveAndGetOneTask_2() throws IOException, InterruptedException {
+    void saveAndGetOneTask_2() {
 
         HttpClient client = newBuilder()
                 .version(HTTP_1_1)
@@ -93,14 +96,17 @@ class HTTPTaskManagerTest {
                 .uri(URI.create("http://localhost:8888/api/v1/tasks/task/?id=1"))
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(task1)))
                 .build();
+        try {
+            HttpResponse<String> response2 = client.send(
+                    requestToAddTask, HttpResponse.BodyHandlers.ofString());
+            assertEquals(201, response2.statusCode());
 
-        HttpResponse<String> response2 = client.send(
-                requestToAddTask, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response2.statusCode());
-
-        task1.setId(1);
-        task1.setEndTime(task1.getStartTime().plusHours(1));
-        assertEquals(task1, httpTaskServer.getHttpTaskManager().getTaskById(1));
+            task1.setId(1);
+            task1.setEndTime(task1.getStartTime().plusHours(1));
+            assertEquals(task1, httpTaskServer.getHttpTaskManager().getTaskById(1));
+        } catch (IOException | InterruptedException e) {
+            fail();
+        }
     }
 
     @Test
@@ -116,6 +122,7 @@ class HTTPTaskManagerTest {
                 LocalDateTime.of(2022, JUNE, 10, 12, 0));//id1
 
         task1.setEndTime(task1.getStartTime().plusHours(1));
+        task1.setId(1);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8888/api/v1/tasks/task/?id=1"))
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(task1)))
@@ -133,7 +140,7 @@ class HTTPTaskManagerTest {
             Task task = gson.fromJson(json, Task.class);
             assertEquals(task1, task);
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.");
+            fail();
         }
     }
 
@@ -167,7 +174,7 @@ class HTTPTaskManagerTest {
             assertEquals(200, response.statusCode());
             assertNull(httpTaskServer.getHttpTaskManager().getTaskById(1));
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.");
+            fail();
         }
     }
 }

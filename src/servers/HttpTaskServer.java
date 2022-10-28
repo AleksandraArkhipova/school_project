@@ -55,61 +55,59 @@ public class HttpTaskServer {
                 System.out.println(httpExchange.getRequestURI());
                 String requestMethod = httpExchange.getRequestMethod();
                 String path = httpExchange.getRequestURI().getPath();
+
                 switch (requestMethod) {
                     case "GET": {
 
-                        if (Pattern.matches("^/api/v1/tasks/history$", path)) {
+                        if (path.contains("/api/v1/tasks/task/prioritized")) {
+                            String response = gson.toJson(httpTaskManager.getSetOfPrioritizedTasks());
+                            sendText(httpExchange, response);
+                            return;
+                        }
+
+                        if (path.contains("/api/v1/tasks/history")) {
                             String response = gson.toJson(httpTaskManager.getHistory());
                             sendText(httpExchange, response);
                             return;
                         }
-                        if (Pattern.matches("^/api/v1/tasks$", path)) {
-                            String response = gson.toJson(httpTaskManager.getListOfAllTasks());
+                        if (path.contains("/api/v1/tasks/task")) {
+                            int id = parseIdFromQuery(httpExchange);
+                            String response;
+                            if (id == -1) {
+                                response = gson.toJson(httpTaskManager.getListOfAllTasks());
+                            } else {
+                                response = gson.toJson(httpTaskManager.getTaskById(id));
+                            }
                             sendText(httpExchange, response);
                             return;
                         }
 
-                        if (Pattern.matches("^/api/v1/subtasks$", path)) {
-                            String response = gson.toJson(httpTaskManager.getListOfAllSubTasks());
+                        if (path.contains("/api/v1/tasks/subtask")) {
+                            int id = parseIdFromQuery(httpExchange);
+                            String response;
+                            if (id == -1) {
+                                response = gson.toJson(httpTaskManager.getListOfAllSubTasks());
+                            } else {
+                                response = gson.toJson(httpTaskManager.getSubTaskById(id));
+                            }
                             sendText(httpExchange, response);
                             return;
                         }
 
-                        if (Pattern.matches("^/api/v1/epics$", path)) {
-                            String response = gson.toJson(httpTaskManager.getListOfAllEpics());
+                        if (path.contains("/api/v1/tasks/epic")) {
+                            int id = parseIdFromQuery(httpExchange);
+                            String response;
+                            if (id == -1) {
+                                response = gson.toJson(httpTaskManager.getListOfAllEpics());
+                            } else {
+                                response = gson.toJson(httpTaskManager.getEpicById(id));
+                            }
                             sendText(httpExchange, response);
                             return;
                         }
 
-                        if (Pattern.matches("^/api/v1/tasks/task/?id=\\d$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/task/?id=", ""));
-                            if (id != -1) {
-                                String response = gson.toJson(httpTaskManager.getTaskById(id));
-                                sendText(httpExchange, response);
-                                return;
-                            }
-                        }
-
-                        if (Pattern.matches("^/api/v1/tasks/subtask/?id=\\d+$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/subtask/?id=", ""));
-                            if (id != -1) {
-                                String response = gson.toJson(httpTaskManager.getSubTaskById(id));
-                                sendText(httpExchange, response);
-                                return;
-                            }
-                        }
-
-                        if (Pattern.matches("^/api/v1/tasks/epic/?id=\\d+$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/epic/?id=", ""));
-                            if (id != -1) {
-                                String response = gson.toJson(httpTaskManager.getEpicById(id));
-                                sendText(httpExchange, response);
-                                return;
-                            }
-                        }
-
-                        if (Pattern.matches("^/api/v1/tasks/subtask/epic/?id=\\d+$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/subtask/epic/?id=", ""));
+                        if (path.contains("/api/v1/tasks/subtask/epic")) {
+                            int id = parseIdFromQuery(httpExchange);
                             if (id != -1) {
                                 String response = gson.toJson(httpTaskManager.getSubtasksByEpicId(id));
                                 sendText(httpExchange, response);
@@ -119,56 +117,49 @@ public class HttpTaskServer {
                         break;
                     }
                     case "DELETE": {
-                        if (Pattern.matches("^/api/v1/tasks$", path)) {
-                            httpTaskManager.removeAllTasks();
-                            System.out.println("Удалили все таски");
-                            httpExchange.sendResponseHeaders(200, 0);
-                        }
-
-                        if (Pattern.matches("^/api/v1/subtasks$", path)) {
-                            httpTaskManager.removeAllSubTasks();
-                            System.out.println("Удалили все сабтаски");
-                            httpExchange.sendResponseHeaders(200, 0);
-                        }
-
-                        if (Pattern.matches("^/api/v1/epics$", path)) {
-                            httpTaskManager.removeAllEpics();
-                            System.out.println("Удалили все эпики");
-                            httpExchange.sendResponseHeaders(200, 0);
-                        }
-
-                        if (Pattern.matches("^/api/v1/tasks/task/?id=\\d$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/task/?id=", ""));
-                            if (id != -1) {
+                        if (path.contains("/api/v1/tasks/task")) {
+                            int id = parseIdFromQuery(httpExchange);
+                            if (id == -1) {
+                                httpTaskManager.removeAllTasks();
+                                System.out.println("Удалили все таски");
+                                httpExchange.sendResponseHeaders(200, 0);
+                            } else {
                                 httpTaskManager.removeTaskById(id);
                                 System.out.println("Удалили таску с id = " + id);
                                 httpExchange.sendResponseHeaders(200, 0);
                             }
                         }
 
-                        if (Pattern.matches("^/api/v1/tasks/subtask/?id=\\d+$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/subtask/?id=", ""));
-                            if (id != -1) {
+                        if (path.contains("/api/v1/tasks/subtask")) {
+                            int id = parseIdFromQuery(httpExchange);
+                            if (id == -1) {
+                                httpTaskManager.removeAllSubTasks();
+                                System.out.println("Удалили все сабтаски");
+                                httpExchange.sendResponseHeaders(200, 0);
+                            } else {
                                 httpTaskManager.removeSubTaskById(id);
                                 System.out.println("Удалили сабтаску с id = " + id);
                                 httpExchange.sendResponseHeaders(200, 0);
                             }
                         }
 
-                        if (Pattern.matches("^/api/v1/tasks/epic/?id=\\d+$", path)) {
-                            int id = parsePathId(path.replaceFirst("/api/v1/tasks/epic/?id=", ""));
-                            if (id != -1) {
+                        if (path.contains("/api/v1/tasks/epic")) {
+                            int id = parseIdFromQuery(httpExchange);
+                            if (id == -1) {
+                                httpTaskManager.removeAllEpics();
+                                System.out.println("Удалили все эпики");
+                                httpExchange.sendResponseHeaders(200, 0);
+                            } else {
                                 httpTaskManager.removeEpicById(id);
                                 System.out.println("Удалили эпик с id = " + id);
                                 httpExchange.sendResponseHeaders(200, 0);
                             }
                         }
-
                         break;
                     }
                     case "POST": {
 
-                        if (Pattern.matches("^/api/v1/tasks/task/$", path)) {
+                        if (path.contains("/api/v1/tasks/task")) {
 
                             String taskStr = readText(httpExchange);
                             Task task = gson.fromJson(taskStr, Task.class);
@@ -183,11 +174,11 @@ public class HttpTaskServer {
                             }
                         }
 
-                        if (Pattern.matches("^/api/v1/tasks/subtask/$", path)) {
+                        if (path.contains("/api/v1/tasks/subtask")) {
 
                             String subtaskStr = readText(httpExchange);
                             SubTask subtask = gson.fromJson(subtaskStr, SubTask.class);
-                            if (!httpTaskManager.getTasksMap().containsKey(subtask.getId())) {
+                            if (!httpTaskManager.getSubtasksMap().containsKey(subtask.getId())) {
                                 httpTaskManager.addSubTask(subtask);
                                 System.out.println("Добавили сабтаску с id = " + subtask.getId());
                                 httpExchange.sendResponseHeaders(201, 0);
@@ -198,11 +189,11 @@ public class HttpTaskServer {
                             }
                         }
 
-                        if (Pattern.matches("^/api/v1/tasks/epic/$", path)) {
+                        if (path.contains("/api/v1/tasks/epic")) {
 
                             String epicStr = readText(httpExchange);
                             Epic epic = gson.fromJson(epicStr, Epic.class);
-                            if (!httpTaskManager.getTasksMap().containsKey(epic.getId())) {
+                            if (!httpTaskManager.getEpicsMap().containsKey(epic.getId())) {
                                 httpTaskManager.addEpic(epic);
                                 System.out.println("Добавили эпик с id = " + epic.getId());
                                 httpExchange.sendResponseHeaders(201, 0);
@@ -229,10 +220,13 @@ public class HttpTaskServer {
         }
     }
 
-    private int parsePathId(String pathId) {
+    private int parseIdFromQuery(HttpExchange httpExchange) {
         try {
-            return Integer.parseInt(pathId);
-        } catch (NumberFormatException e) {
+            return Integer.parseInt(httpExchange
+                    .getRequestURI()
+                    .getQuery()
+                    .replace("id=", ""));
+        } catch (NumberFormatException | NullPointerException e) {
             return -1;
         }
     }

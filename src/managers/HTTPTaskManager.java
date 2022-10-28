@@ -10,6 +10,7 @@ import tasks.Task;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,8 @@ public class HTTPTaskManager extends FileBackedTasksManager {
             kvTaskClient.put("epics", gson.toJson(epicsMap));
             kvTaskClient.put("subtasks", gson.toJson(subtasksMap));
             kvTaskClient.put("history", gson.toJson(historyManager.getHistoryList()));
+            kvTaskClient.put("uniqueId", gson.toJson(uniqueId));
+            kvTaskClient.put("timeIntersectionMap", gson.toJson(timeIntersectionMap));
 
         } catch (IOException | InterruptedException e) {
             System.out.println("Ошибка при сохранении данных менеджер");
@@ -67,19 +70,25 @@ public class HTTPTaskManager extends FileBackedTasksManager {
                     new TypeToken<List<Task>>() {
                     }.getType()
             );
+            Map<LocalDateTime, Boolean> timeIntersectionMap = gson.fromJson(
+                    kvTaskClient.load("timeIntersectionMap"),
+                    new TypeToken<Map<LocalDateTime, Boolean>>() {
+                    }.getType()
+            );
+            int uniqueId = gson.fromJson(kvTaskClient.load("history"), Integer.class);
+
             this.tasksMap = tasksMap;
             this.epicsMap = epicsMap;
             this.subtasksMap = subtasksMap;
             this.setOfPrioritizedTasks.addAll(tasksMap.values());
             this.setOfPrioritizedTasks.addAll(subtasksMap.values());
+            this.uniqueId = uniqueId;
+            this.timeIntersectionMap = timeIntersectionMap;
 
-            HistoryManageable historyManager = new InMemoryHistoryManager();
-            historyList.forEach(historyManager::add);
-            this.historyManager = historyManager;
+            historyList.forEach(this.historyManager::add);
 
         } catch (IOException | InterruptedException e) {
             System.out.println("Ошибка при загрузке данных менеджера");
-
         }
     }
 }
