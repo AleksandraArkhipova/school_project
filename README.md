@@ -1,2 +1,1 @@
-# java-kanban
-Repository for homework project.
+Stack: Java 11, Http-Server, API, JUnit
